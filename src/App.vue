@@ -1,4 +1,26 @@
 <script setup>
+import Canvas from "./components/Canvas.vue";
+</script>
+
+<template>
+  <header>
+    <h1 id="title">Canvas</h1>
+  </header>
+  <div>
+    <Canvas />
+  </div>
+</template>
+
+<style scoped>
+#title {
+  background-color: aquamarine;
+  color: aliceblue;
+  text-align: center;
+  font-family: sans-serif;
+}
+</style>
+
+<!-- <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 </script>
@@ -82,4 +104,4 @@ nav a:first-of-type {
     margin-top: 1rem;
   }
 }
-</style>
+</style> -->
