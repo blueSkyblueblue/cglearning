@@ -111,8 +111,8 @@ onMounted(() => {
 
   const threeView = []; // an array holding all three-view custom renderer (both renderer and camera)
   threeView.push(new CustomRenderer(cvsWidth, cvsHeight, [0, 0, 6])); // Face to face
-  threeView.push(new CustomRenderer(cvsWidth, cvsHeight, [0, 0, 6])); // Look down
-  threeView.push(new CustomRenderer(cvsWidth, cvsHeight, [0, 0, 6])); // Look right
+  threeView.push(new CustomRenderer(cvsWidth, cvsHeight, [0, 6, 0])); // Look down
+  threeView.push(new CustomRenderer(cvsWidth, cvsHeight, [-6, 0, 0])); // Look right
 
   const renderer = new CustomRenderer(cvsWidth, cvsHeight, [0, 0, 6], true); // Perspective Projection
 
