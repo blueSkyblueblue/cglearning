@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const cvs = ref(null);
 let cvsWidth = 0;
@@ -16,65 +15,143 @@ function logInfo() {
 }
 
 onMounted(() => {
-  cvsWidth = cvs.value.clientWidth;
-  cvsHeight = cvs.value.clientHeight;
+  cvsWidth = cvs.value.clientWidth / 2;
+  cvsHeight = cvs.value.clientHeight / 2;
 
   const renderer = new THREE.WebGLRenderer(); // Renderer
   renderer.setSize(cvsWidth, cvsHeight);
+  renderer.setViewport(cvsWidth, 0, cvsWidth, cvsHeight);
+  renderer.setPixelRatio(deviceRatio);
   logInfo(); // log information about the canvas container's client size
 
-  const camera = new THREE.PerspectiveCamera( // Camera (Perspective)
+  const rendererFace = new THREE.WebGLRenderer(); // Renderer
+  rendererFace.setSize(cvsWidth, cvsHeight);
+  rendererFace.setViewport(0, cvsHeight, cvsWidth, cvsHeight);
+  rendererFace.setPixelRatio(deviceRatio);
+
+  const rendererLeft = new THREE.WebGLRenderer(); // Renderer
+  rendererLeft.setSize(cvsWidth, cvsHeight);
+  rendererLeft.setViewport(0, 0, cvsWidth, cvsHeight);
+  rendererLeft.setPixelRatio(deviceRatio);
+
+  const rendererRight = new THREE.WebGLRenderer(); // Renderer
+  rendererRight.setSize(cvsWidth, cvsHeight);
+  rendererRight.setViewport(cvsWidth, cvsHeight, cvsWidth, cvsHeight);
+  rendererRight.setPixelRatio(deviceRatio);
+
+  const perspectiveCamera = new THREE.PerspectiveCamera( // Camera (Perspective)
     75,
     cvsWidth / cvsHeight,
     0.1,
     500
   );
 
-  camera.position.set(0, 6, 0);
-  camera.lookAt(0, 0, 0);
-  camera.updateProjectionMatrix();
+  perspectiveCamera.position.set(0, 6, 0);
+  perspectiveCamera.lookAt(0, 0, 0);
+  perspectiveCamera.updateProjectionMatrix();
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  // Orthographic Cameras (Face, Left, Right)
+  const orthographicCameraFace = new THREE.OrthographicCamera(
+    -5,
+    5,
+    5,
+    -5,
+    0.1,
+    500
+  );
+
+  orthographicCameraFace.position.set(0, 6, 0);
+  orthographicCameraFace.lookAt(0, 0, 0);
+  orthographicCameraFace.updateProjectionMatrix();
+
+  const orthographicCameraRight = new THREE.OrthographicCamera(
+    -5,
+    5,
+    5,
+    -5,
+    0.1,
+    500
+  );
+
+  orthographicCameraRight.position.set(-6, 0, 0);
+  orthographicCameraRight.lookAt(0, 0, 0);
+  orthographicCameraRight.updateProjectionMatrix();
+
+  const orthographicCameraLeft = new THREE.OrthographicCamera(
+    -5,
+    5,
+    5,
+    -5,
+    0.1,
+    500
+  );
+
+  orthographicCameraLeft.position.set(0, 0, 6);
+  orthographicCameraLeft.lookAt(0, 0, 0);
+  orthographicCameraLeft.updateProjectionMatrix();
+
+  // const controls = new OrbitControls(perspectiveCamera, renderer.domElement);
+  // const controlsFace = new OrbitControls(
+  //   orthographicCameraFace,
+  //   rendererFace.domElement
+  // );
 
   const scene = new THREE.Scene(); // Scene
   scene.fog = new THREE.FogExp2("lightblue", 0.1);
   scene.background = new THREE.Color("lightblue");
 
   renderer.domElement.classList.add("top-margin");
+  cvs.value.appendChild(rendererFace.domElement);
+  cvs.value.appendChild(rendererRight.domElement);
+  cvs.value.appendChild(rendererLeft.domElement);
   cvs.value.appendChild(renderer.domElement);
 
-  const atomGeometry = new THREE.SphereGeometry(1);
-  const yellowMaterial = new THREE.MeshBasicMaterial({
-    color: "yellow",
-    wireframe: false,
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+  scene.add(ambientLight);
+
+  const directonalLight = new THREE.DirectionalLight(0xffffff, 10);
+  directonalLight.position.set(10, 10, 2);
+  scene.add(directonalLight);
+
+  const tetraGeometry = new THREE.TetrahedronGeometry(2);
+  const basicMaterial = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
+  const tetrahedron = new THREE.Mesh(tetraGeometry, basicMaterial);
+  scene.add(tetrahedron);
+
+  rendererFace.domElement.addEventListener("mousemove", (e) => {
+    console.log("drag: ", e);
+    if (e.buttons === 1) {
+      scene.rotation.x += e.movementY / 40;
+      scene.rotation.z -= e.movementX / 40;
+    }
   });
-  const atom = new THREE.Mesh(atomGeometry, yellowMaterial);
-  scene.add(atom);
 
-  const electronGeometry = new THREE.SphereGeometry(0.2);
-  const purpleMaterial = new THREE.MeshBasicMaterial({ color: "purple" });
-  const electron = new THREE.Mesh(electronGeometry, purpleMaterial);
-
-  const electOrbit = new THREE.Object3D();
-  electOrbit.add(electron);
-  scene.add(electOrbit);
-
-  electron.position.set(3, 0, 0);
+  const helper = new THREE.AxesHelper(5);
+  scene.add(helper);
+  const tetraHelper = new THREE.AxesHelper(5);
+  tetrahedron.add(tetraHelper);
 
   window.addEventListener("resize", () => {
     cvsWidth = cvs.value.clientWidth;
     cvsHeight = cvs.value.clientHeight;
 
+    rendererFace.setSize(cvsWidth, cvsHeight);
+    rendererRight.setSize(cvsWidth, cvsHeight);
+    rendererLeft.setSize(cvsWidth, cvsHeight);
     renderer.setSize(cvsWidth, cvsHeight);
-    camera.aspect = cvsWidth / cvsHeight;
-    camera.updateProjectionMatrix();
+
+    perspectiveCamera.aspect = cvsWidth / cvsHeight;
+    perspectiveCamera.updateProjectionMatrix();
   });
 
   function animate(time) {
-    atom.rotation.y = time * 0.0005;
-    electOrbit.rotation.y = time * 0.001;
+    // atom.rotation.y = time * 0.0005;
+    // electOrbit.rotation.y = time * 0.001;
 
-    renderer.render(scene, camera);
+    rendererFace.render(scene, orthographicCameraFace);
+    rendererRight.render(scene, orthographicCameraRight);
+    rendererLeft.render(scene, orthographicCameraLeft);
+    renderer.render(scene, perspectiveCamera);
   }
 
   renderer.setAnimationLoop(animate);
@@ -93,11 +170,15 @@ onMounted(() => {
   height: 70vh;
   margin: auto;
   background-color: antiquewhite;
+
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
 </style>
 
 <style>
 .top-margin {
-  margin-top: 2em;
+  margin: 0;
 }
 </style>
