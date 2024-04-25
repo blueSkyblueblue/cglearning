@@ -3,49 +3,50 @@ import Canvas from "./components/Canvas.vue";
 </script>
 
 <template>
-  <main>
-    <nav class="navigation-container">
-      <div></div>
-    </nav>
-    <div class="renderer-target-container">
-      <h1 id="title">Canvas</h1>
-      <Canvas class="decoration" />
-    </div>
-  </main>
+	<main>
+		<nav class="navigation-container">
+			<div></div>
+		</nav>
+		<div class="renderer-target-container">
+			<h1 id="title">Canvas</h1>
+			<Canvas class="decoration" />
+		</div>
+	</main>
 </template>
 
 <style scoped>
 main {
-  display: flex;
+	display: flex;
 }
 
 #title {
-  background-color: blueviolet;
-  border-radius: 3px;
-  margin: 20px 30px;
-  padding: 5px;
-  color: rgb(51, 47, 47);
-  text-align: center;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
+	background-color: blueviolet;
+	border-radius: 3px;
+	margin: 20px 30px;
+	padding: 4px;
+	font-size: 20px;
+	color: rgb(51, 47, 47);
+	text-align: center;
+	font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+		"Lucida Sans", Arial, sans-serif;
 }
 
 .navigation-container {
-  background-color: maroon;
-  margin-top: 20px;
-  width: 300px;
-  border-radius: 4px;
+	background-color: maroon;
+	margin-top: 20px;
+	width: 300px;
+	border-radius: 4px;
 }
 
 .renderer-target-container {
-  flex: auto;
+	flex: auto;
 }
 
 .decoration {
-  border-left: 8px solid black;
-  border-right: 8px solid black;
-  border-radius: 10px;
-  padding: 0 30px;
+	border-left: 8px solid rgb(150, 135, 135);
+	border-right: 8px solid rgb(150, 135, 135);
+	border-radius: 4px;
+	padding: 0 50px;
 }
 </style>
 
