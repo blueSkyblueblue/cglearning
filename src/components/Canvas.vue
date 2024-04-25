@@ -171,6 +171,17 @@ onMounted(() => {
     }
   });
 
+  renderer.domElement.addEventListener("wheel", e => {
+    console.log("wheel: ", e);
+    // rotation on the world z axis
+    if (e.wheelDelta > 0) {
+      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), 0.1);
+      return;
+    }
+
+    tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), -0.1);
+  });
+
   // Handling window resize event.
   window.addEventListener("resize", () => {
     containerSetup();
