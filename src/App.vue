@@ -3,20 +3,49 @@ import Canvas from "./components/Canvas.vue";
 </script>
 
 <template>
-  <header>
-    <h1 id="title">Canvas</h1>
-  </header>
-  <div>
-    <Canvas />
-  </div>
+  <main>
+    <nav class="navigation-container">
+      <div></div>
+    </nav>
+    <div class="renderer-target-container">
+      <h1 id="title">Canvas</h1>
+      <Canvas class="decoration" />
+    </div>
+  </main>
 </template>
 
 <style scoped>
+main {
+  display: flex;
+}
+
 #title {
-  background-color: aquamarine;
-  color: aliceblue;
+  background-color: blueviolet;
+  border-radius: 3px;
+  margin: 20px 30px;
+  padding: 5px;
+  color: rgb(51, 47, 47);
   text-align: center;
-  font-family: sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+.navigation-container {
+  background-color: maroon;
+  margin-top: 20px;
+  width: 300px;
+  border-radius: 4px;
+}
+
+.renderer-target-container {
+  flex: auto;
+}
+
+.decoration {
+  border-left: 8px solid black;
+  border-right: 8px solid black;
+  border-radius: 10px;
+  padding: 0 30px;
 }
 </style>
 
