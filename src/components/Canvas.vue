@@ -173,6 +173,8 @@ onMounted(() => {
 
   renderer.domElement.addEventListener("wheel", e => {
     console.log("wheel: ", e);
+
+    e.preventDefault();
     // rotation on the world z axis
     if (e.wheelDelta > 0) {
       tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), 0.1);
