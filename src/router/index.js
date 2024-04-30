@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Canvas from "@/views/CanvasView.vue";
+import CanvasView from "@/views/CanvasView.vue";
+import SolarSystemView from "@/views/SolarSystemView.vue";
 // import HomeView from "../views/HomeView.vue";
 
 const router = createRouter({
@@ -8,7 +9,12 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: Canvas,
+      component: CanvasView,
+    },
+    {
+      path: "/solarsystem",
+      name: "solarsystem",
+      component: SolarSystemView,
     },
     // {
     //   path: '/',
