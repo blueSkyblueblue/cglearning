@@ -39,7 +39,9 @@ function typeChanged(type, vertices) {
         :vertices="vertices"
       />
     </div>
-    <nav class="right navigation-container information"></nav>
+    <aside class="right navigation-container information">
+      <a href="./solarsystem">Solar System</a>
+    </aside>
   </main>
   <footer>
     <div class="websize-info">
