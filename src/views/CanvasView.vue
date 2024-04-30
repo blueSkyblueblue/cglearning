@@ -3,6 +3,7 @@ import ControlPanel from "@/components/ControlPanel.vue";
 import RendererContent from "@/components/RendererContent.vue";
 import { ref } from "vue";
 import { Vector3 } from "three";
+import { RouterLink } from "vue-router";
 
 const position = ref(new Vector3(0, 0, 0));
 const rotation = ref(new Vector3(0, 0, 0));
@@ -40,7 +41,7 @@ function typeChanged(type, vertices) {
       />
     </div>
     <aside class="right navigation-container information">
-      <a href="./solarsystem">Solar System</a>
+      <RouterLink to="/solarsystem">Solar System</RouterLink>
     </aside>
   </main>
   <footer>
