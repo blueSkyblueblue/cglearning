@@ -2,9 +2,10 @@
 import { onMounted, ref } from "vue";
 import * as THREE from "three";
 
+// Textures (Images)
+
 // Testing
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { Texture } from "three";
 
 const container = ref(null);
 
@@ -29,12 +30,12 @@ onMounted(() => {
   const scene = new THREE.Scene();
   const loader = new THREE.CubeTextureLoader();
   const backgroundTexture = loader.load([
-    "textures/background1.png",
-    "textures/background1.png",
-    "textures/background1.png",
-    "textures/background1.png",
-    "textures/background1.png",
-    "textures/background1.png",
+    "textures/stars.jpg",
+    "textures/stars.jpg",
+    "textures/stars.jpg",
+    "textures/stars.jpg",
+    "textures/stars.jpg",
+    "textures/stars.jpg",
   ]);
 
   scene.background = backgroundTexture;
@@ -49,10 +50,9 @@ onMounted(() => {
 
   const sunGeometry = new THREE.SphereGeometry(2.5, 50, 50);
   const textureLoader = new THREE.TextureLoader();
-  const sunSurface = textureLoader.load("textures/sunface.jpg");
-  const sunMaterial = new THREE.MeshStandardMaterial({
+  const sunSurface = textureLoader.load("textures/sun.jpg");
+  const sunMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
-    emissive: 0xffff60,
     map: sunSurface,
   });
 
@@ -64,7 +64,9 @@ onMounted(() => {
   solarSystem.add(sun);
 
   const planetGeometry = new THREE.SphereGeometry(1);
-  const planetMaterial = new THREE.MeshStandardMaterial({ color: "lightblue" });
+  const planetMaterial = new THREE.MeshStandardMaterial({
+    map: textureLoader.load("textures/earth.jpg"),
+  });
   const planet = new THREE.Mesh(planetGeometry, planetMaterial);
   planet.position.set(15, 0, 0);
   sun.add(planet);
@@ -73,7 +75,7 @@ onMounted(() => {
   planet.add(satelliteSystem1);
 
   const satelliteGeo1 = new THREE.SphereGeometry(0.3);
-  const satelliteMat1 = new THREE.MeshStandardMaterial({ color: "brown" });
+  const satelliteMat1 = new THREE.MeshStandardMaterial({ color: 0xb38769 });
   const satellite1 = new THREE.Mesh(satelliteGeo1, satelliteMat1);
   satellite1.position.set(2, 0, 0);
   satelliteSystem1.add(satellite1);
@@ -82,7 +84,7 @@ onMounted(() => {
   planet.add(satelliteSystem2);
 
   const satelliteGeo2 = new THREE.SphereGeometry(0.35);
-  const satelliteMat2 = new THREE.MeshStandardMaterial({ color: "brown" });
+  const satelliteMat2 = new THREE.MeshStandardMaterial({ color: "gray" });
   const satellite2 = new THREE.Mesh(satelliteGeo2, satelliteMat2);
   satellite2.position.set(3, 0, 0);
   satelliteSystem2.add(satellite2);
