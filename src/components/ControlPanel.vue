@@ -55,15 +55,9 @@ watch(isRegular, async (current, previous) => {
   <hr />
   <div class="orientation">
     <div>Object Rotation:</div>
-    <div>
-      x: <input type="number" :value="rotation.x" step="0.1" disabled />
-    </div>
-    <div>
-      y: <input type="number" :value="rotation.y" step="0.1" disabled />
-    </div>
-    <div>
-      z: <input type="number" :value="rotation.z" step="0.1" disabled />
-    </div>
+    <div>x: <input type="number" :value="rotation.x" step="0.1" disabled /></div>
+    <div>y: <input type="number" :value="rotation.y" step="0.1" disabled /></div>
+    <div>z: <input type="number" :value="rotation.z" step="0.1" disabled /></div>
   </div>
   <hr />
   <div class="vertices">
