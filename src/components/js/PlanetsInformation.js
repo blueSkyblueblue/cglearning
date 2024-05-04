@@ -5,7 +5,7 @@ const planetsInfomation = [
   [
     {
       radius: 10,
-      segments: [40, 40],
+      segments: [40, 20],
       distance: 0,
       rotateSpeed: 0,
       selfRotateSpeed: 0.4,
@@ -31,6 +31,7 @@ const planetsInfomation = [
   [
     {
       radius: 0.15,
+      segments: [20, 10],
       distance: 2.25,
       rotateSpeed: 7,
       selfRotateSpeed: 1.5,
@@ -42,6 +43,7 @@ const planetsInfomation = [
   [
     {
       radius: 0.2,
+      segments: [20, 10],
       distance: 3.25,
       rotateSpeed: 8,
       selfRotateSpeed: 2,
@@ -53,6 +55,7 @@ const planetsInfomation = [
   [
     {
       radius: 0.5,
+      segments: [24, 12],
       distance: 20,
       rotateSpeed: 3,
       selfRotateSpeed: 1.2,
@@ -136,6 +139,7 @@ const planetsInfomation = [
   [
     {
       radius: 0.48,
+      segments: [24, 12],
       distance: 100,
       rotateSpeed: 0.6,
       selfRotateSpeed: 0.5,
