@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount, onMounted, ref, watch } from "vue";
+import { callWithErrorHandling, onBeforeMount, onMounted, ref, watch } from "vue";
 import * as THREE from "three";
 import planetsInfromation from "./js/PlanetsInformation.js";
 
@@ -49,7 +49,7 @@ watch(appSetting.setting, async current => {
   if (appSetting.setting.fixedUp !== CameraOptions.isUpFixed) {
     CameraOptions.isUpFixed = appSetting.setting.fixedUp;
     CameraOptions.MOTIONS = CameraOptions.MOTION_STORAGE[Number(CameraOptions.isUpFixed)];
-    camera.rotation.set(0, 0, 0); // reset the camera's rotation
+    CameraOptions.reset();
   }
 });
 
@@ -70,12 +70,12 @@ class CameraOptions {
     ],
     [
       dis => {
-        camera.position.z -= dis * Math.sin(this.direction.yaw);
-        camera.position.x += dis * Math.cos(this.direction.yaw);
+        camera.position.z -= dis * Math.cos(this.direction.yaw);
+        camera.position.x -= dis * Math.sin(this.direction.yaw);
       },
       dis => {
-        camera.position.z += dis * Math.sin(this.direction.yaw);
-        camera.position.x -= dis * Math.cos(this.direction.yaw);
+        camera.position.z += dis * Math.cos(this.direction.yaw);
+        camera.position.x += dis * Math.sin(this.direction.yaw);
       },
       dis => camera.translateX(-dis),
       dis => camera.translateX(dis),
@@ -94,6 +94,13 @@ class CameraOptions {
 
   static remove(motion) {
     this.moveFuncs = this.moveFuncs.filter(func => func !== motion);
+  }
+
+  static reset() {
+    camera.position.set(0, 5, 100);
+    camera.rotation.set(0, 0, 0);
+    CameraOptions.direction.yaw = 0;
+    CameraOptions.direction.pitch = 0;
   }
 
   static rotateCamera(xoffset, yoffset) {
