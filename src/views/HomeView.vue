@@ -6,7 +6,9 @@ import { RouterLink } from "vue-router";
   <div class="header">
     <div class="padding"></div>
     <div class="padding"></div>
-    <header><h1>Experiments (Computer Graphics)</h1></header>
+    <header>
+      <h1>Experiments (Computer Graphics)</h1>
+    </header>
     <main>
       <div class="padding"></div>
       <div class="padding"></div>
@@ -49,6 +51,17 @@ import { RouterLink } from "vue-router";
   background: linear-gradient(to right bottom, rgb(173, 180, 104), rgb(255, 162, 0));
 }
 
+header > h1::before {
+  display: inline-block;
+  content: "";
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: -0.3em;
+  margin-right: 0.5em;
+  background-image: url("logo/tetrahedron.ico");
+  background-size: cover;
+}
+
 .introduction {
   width: 100%;
   height: 62vh;
@@ -84,7 +97,7 @@ import { RouterLink } from "vue-router";
 }
 
 .introduction > .block:last-of-type {
-  color: rgb(230, 255, 238);
+  color: rgb(255, 230, 235);
   background-color: rgb(98, 23, 47);
 }
 

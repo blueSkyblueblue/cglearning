@@ -1,12 +1,8 @@
 <script setup>
 import { Vector3 } from "three";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 const isRegular = ref(true);
-
-function toggleType() {
-  isRegular.value = !isRegular.value;
-}
 
 defineProps({
   position: Vector3,
@@ -21,88 +17,189 @@ const vertices = [
 ];
 
 const emit = defineEmits(["tetra-type-changed"]);
-watch(isRegular, async (current, previous) => {
-  alert(current);
-  emit("tetra-type-changed", current, vertices);
-});
+
+function toggleType() {
+  isRegular.value = !isRegular.value;
+  emit("tetra-type-changed", isRegular.value, vertices);
+
+  const panel = document.getElementById("vertices");
+  if (isRegular.value === true) panel.classList.add("close-vertices-panel");
+  else panel.classList.remove("close-vertices-panel");
+
+  console.log(panel.clientHeight);
+}
 </script>
 
 <template>
   <h3>Control Panel</h3>
-  <div class="tetrahedron-type">
+  <div class="section">
     <div class="item-header">Tetrahedron Type:</div>
-    <div class="radio-button">
-      <input
-        type="radio"
-        name="tetrahedron-type"
-        id="regular-type"
-        @change="toggleType"
-        :checked="isRegular"
-      />
-      <label for="regular-type">Regular</label>
-    </div>
-    <div class="radio-button">
-      <input
-        type="radio"
-        name="tetrahedron-type"
-        id="normal-type"
-        @change="toggleType"
-        :checked="!isRegular"
-      />
-      <label for="normal-type">Custom</label>
+    <div class="buttons">
+      <div class="radio-button">
+        <input type="radio" id="regular-type" @change="toggleType" :checked="isRegular" />
+        <label for="regular-type">Regular</label>
+      </div>
+      <div class="radio-button">
+        <input type="radio" id="normal-type" @change="toggleType" :checked="!isRegular" />
+        <label for="normal-type">Custom</label>
+      </div>
     </div>
   </div>
-  <hr />
-  <div class="orientation">
-    <div>Object Rotation:</div>
-    <div>x: <input type="number" :value="rotation.x" step="0.1" disabled /></div>
-    <div>y: <input type="number" :value="rotation.y" step="0.1" disabled /></div>
-    <div>z: <input type="number" :value="rotation.z" step="0.1" disabled /></div>
+  <!-- <hr /> -->
+  <div id="vertices" class="close-vertices-panel">
+    <div class="vertices-header">Setup the Vertices' Position</div>
+    <ul>
+      <li class="vertex-item" v-for="(item, index) in vertices">
+        <span class="vertex-prefix"> {{ ["A", "B", "C", "D"][index] }} : </span>
+        <div class="vertex-value">
+          <div v-for="(subitem, i) in item">
+            <label :for="'vertices_' + index + '_' + i"> {{ ["x", "y", "z"][i] }} :</label>
+            <input type="number" :id="'vertices_' + index + '_' + i" step="0.1" :value="subitem" />
+          </div>
+        </div>
+      </li>
+    </ul>
+
+    <button type="button">commit</button>
+  </div>
+
+  <!-- <hr /> -->
+  <div class="section">
+    <div class="item-header">Object Rotation: <em>(read only)</em></div>
+    <div><b>x:</b> <input type="number" :value="rotation.x" disabled /></div>
+    <div><b>y:</b> <input type="number" :value="rotation.y" disabled /></div>
+    <div><b>z:</b> <input type="number" :value="rotation.z" disabled /></div>
   </div>
   <hr />
-  <div class="vertices">
-    <div>Setup Vetices</div>
-  </div>
 </template>
 
 <style scoped>
 h3 {
   text-align: center;
+  font-size: 20px;
+  margin-top: 0.4em;
+  margin-bottom: 0.6em;
+  font-weight: bold;
+}
+
+.section {
+  padding: 10px 20px 20px;
 }
 
 .item-header {
-  font-size: large;
+  font-size: 16px;
   color: rgb(112, 69, 12);
+  margin-bottom: 10px;
+}
+
+.buttons {
+  width: 100%;
+  height: 2em;
+  display: flex;
+  justify-content: space-around;
 }
 
 .radio-button {
+  position: relative;
+  width: 40%;
   display: inline-block;
-  padding: 5px;
-  padding-right: 30px;
-  margin-right: 10px;
-  margin-top: 10px;
+}
+
+.radio-button > input {
+  position: absolute;
+  height: 100%;
+  margin-left: 8px;
+  display: inline-block;
+}
+
+.radio-button > label {
+  border-radius: 4px;
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  line-height: 200%;
+  text-align: center;
+  background-color: rgb(71, 152, 206);
   background-color: rgb(223, 178, 139);
-  border-radius: 2px;
 }
 
-.radio-button:hover {
-  background-color: rgb(238, 219, 201);
+.radio-button > input:hover,
+.radio-button > input:hover + label,
+.radio-button > label:hover {
   color: rgb(247, 105, 255);
+  cursor: pointer;
+  background-color: rgb(238, 219, 201);
 }
 
-.radio-button > input[type="radio"] {
-  margin-right: 8px;
+#vertices {
+  display: block;
+  background-color: rgb(84, 124, 159);
+  border-radius: 3px;
+  margin: 0 5px;
+  overflow-y: hidden;
+  max-height: 1500px;
+  transition: max-height 0.5s ease-in-out;
 }
 
-.tetrahedron-type {
-  padding: 20px;
-
-  /* testing */
-  border: 1px solid black;
+.vertices-header {
+  color: white;
+  padding: 5px 0;
+  text-align: center;
 }
 
-.orientation {
-  padding: 20px;
-  border: 1px solid black;
+#vertices > ul {
+  padding: 0;
+  list-style: none;
+}
+
+.vertex-prefix {
+  font-weight: bolder;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3em;
+  background-color: rgb(133, 144, 140);
+}
+
+.vertex-value label {
+  display: inline-block;
+  width: 2.4em;
+  text-align: center;
+  font-size: larger;
+  font-weight: bold;
+}
+
+.vertex-value input {
+  padding: 0.3em 0.6em;
+  outline: none;
+  border: none;
+  background-color: rgb(213, 213, 213);
+}
+
+.vertex-item {
+  display: flex;
+  background-color: rgb(177, 190, 185);
+}
+
+.vertex-item:nth-of-type(even) {
+  background-color: rgb(192, 189, 199);
+}
+
+.vertex-item:nth-of-type(odd) > .vertex-prefix {
+  background-color: color-mix(in srgb, rgb(82, 119, 107) 85%, white);
+}
+
+#vertices > button {
+  display: block;
+  margin: 10px auto;
+  outline: none;
+  padding: 0.5em 1.5em;
+}
+</style>
+
+<style>
+#vertices.close-vertices-panel {
+  max-height: 0;
 }
 </style>
