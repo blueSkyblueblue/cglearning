@@ -1,5 +1,3 @@
-import { radToDeg } from "three/src/math/MathUtils";
-
 //////////////////////////////////////////////////
 const planetsInfomation = [
   [
