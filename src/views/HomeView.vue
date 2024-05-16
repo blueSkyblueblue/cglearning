@@ -58,7 +58,7 @@ header > h1::before {
   height: 1.5em;
   vertical-align: -0.3em;
   margin-right: 0.5em;
-  background-image: url("logo/tetrahedron.ico");
+  background-image: url("@/logo/tetrahedron.ico");
   background-size: cover;
 }
 
