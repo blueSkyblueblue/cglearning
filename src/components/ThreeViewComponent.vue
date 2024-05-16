@@ -82,10 +82,7 @@ function updateRotation(obj) {
 }
 
 function containerSetup() {
-  const sideLength = Math.min(
-    window.innerWidth * 0.28,
-    window.innerHeight * 0.42
-  );
+  const sideLength = Math.min(window.innerWidth * 0.28, window.innerHeight * 0.42);
 
   cvsWidth = sideLength;
   cvsHeight = sideLength;
@@ -101,9 +98,7 @@ function lightSetup(scene) {
   scene.add(ambientLight, directonalLight);
 
   // Directional light's helper
-  const directonalLightHelper = new THREE.DirectionalLightHelper(
-    directonalLight
-  );
+  const directonalLightHelper = new THREE.DirectionalLightHelper(directonalLight);
   scene.add(directonalLightHelper);
 }
 
@@ -148,24 +143,16 @@ function setupEventHandler(renderer) {
     console.log("mousemove: ", e);
     if (e.buttons === 1) {
       // rotation on the world x axis
-      tetrahedron.rotateOnWorldAxis(
-        new THREE.Vector3(1, 0, 0),
-        e.movementY / 40
-      );
+      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), e.movementY / 40);
 
       // rotation on the world y axis
-      tetrahedron.rotateOnWorldAxis(
-        new THREE.Vector3(0, 1, 0),
-        e.movementX / 40
-      );
+      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), e.movementX / 40);
 
       updateRotation(tetrahedron);
     }
   });
 
   renderer.domElement.addEventListener("wheel", e => {
-    console.log("wheel: ", e);
-
     e.preventDefault();
     // rotation on the world z axis
     if (e.wheelDelta > 0) {
@@ -207,9 +194,7 @@ onMounted(() => {
 
   // Append all the renderers' domElements the the canvas container.
   const labels = ["Main View", "Left View", "Top View"];
-  threeView.forEach((renderer, index) =>
-    cvs.value.appendChild(renderer.addLabel(labels[index]))
-  ); // three-view
+  threeView.forEach((renderer, index) => cvs.value.appendChild(renderer.addLabel(labels[index]))); // three-view
   cvs.value.appendChild(renderer.domElement); // perspective-view
 
   // Tetrahedron Object
@@ -231,8 +216,6 @@ onMounted(() => {
 
   renderer.renderer.setAnimationLoop(animate);
   ////////////////////////////////////////////////////////////////////////////
-
-  console.log("Everthing works fine.");
 });
 </script>
 
@@ -243,7 +226,6 @@ onMounted(() => {
 <style scoped>
 #container {
   margin: auto;
-
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;

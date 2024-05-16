@@ -1,6 +1,6 @@
 <script setup>
 import ControlPanel from "@/components/ControlPanel.vue";
-import RendererContent from "@/components/RendererContent.vue";
+import RendererContent from "@/components/ThreeViewComponent.vue";
 import { ref } from "vue";
 import { Vector3 } from "three";
 import { RouterLink } from "vue-router";
@@ -21,11 +21,7 @@ function typeChanged(type, vertices) {
 <template>
   <main>
     <nav class="left navigation-container">
-      <ControlPanel
-        :position="position"
-        :rotation="rotation"
-        @tetra-type-changed="typeChanged"
-      />
+      <ControlPanel :position="position" :rotation="rotation" @tetra-type-changed="typeChanged" />
     </nav>
     <div class="renderer-target-container">
       <h1 id="title">
@@ -66,8 +62,8 @@ main {
   font-size: 20px;
   color: rgb(51, 47, 47);
   text-align: center;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial,
+    sans-serif;
 }
 
 .navigation-container {
@@ -89,10 +85,10 @@ main {
 }
 
 .decoration {
-  border-left: 8px solid rgb(150, 135, 135);
+  /* border-left: 8px solid rgb(150, 135, 135);
   border-right: 8px solid rgb(150, 135, 135);
-  border-radius: 4px;
-  padding: 0 50px;
+  border-radius: 4px; */
+  /* margin: 0 50px; */
 }
 
 .websize-info {
@@ -110,7 +106,7 @@ main {
   content: "😁";
 }
 
-@media screen and (max-width: 1000px) {
+/* @media screen and (max-width: 1000px) {
   .left {
     display: none;
   }
@@ -118,7 +114,7 @@ main {
   .right {
     display: none;
   }
-}
+} */
 
 @media screen and (min-width: 1180px) {
   .right {

@@ -1,5 +1,5 @@
 <script setup>
-import { callWithErrorHandling, onBeforeMount, onMounted, ref, watch } from "vue";
+import { onBeforeMount, onMounted, ref, watch } from "vue";
 import * as THREE from "three";
 import planetsInfromation from "./js/PlanetsInformation.js";
 
