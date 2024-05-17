@@ -1,27 +1,29 @@
 <script setup>
 import { onMounted, onBeforeMount, ref, watch } from "vue";
 import * as THREE from "three";
-import planetsInfromation from "./js/PlanetsInformation.js";
 
-const props = defineProps(["setting", "fullscreen"]);
+const emit = defineEmits(["update-done"]);
+const props = defineProps({
+  setting: { type: Object, required: true },
+  planets: { type: Array, required: true },
+  updated: { type: Boolean, required: false, default: false },
+});
 
+const planetsInformation = props.planets;
 const rendererDom = ref(null);
 let renderer = null;
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 800);
-
 const planets = [];
 const orbits = [];
 
 let currentOrbitState = props.setting.showOrbit;
-watch(props.setting, async current => {
-  console.log("current", current);
-
+watch(props.setting, async () => {
+  console.log("current", props.setting);
   if (props.setting.showOrbit !== currentOrbitState) {
     currentOrbitState = props.setting.showOrbit;
     if (currentOrbitState === true) {
-      planetsInfromation.forEach((item, i) => addOrbitToScene(orbits[i], item[1]));
+      planetsInformation.forEach((item, i) => addOrbitToScene(orbits[i], item[1]));
     } else {
       removeOrbitsFromScene();
     }
@@ -31,6 +33,13 @@ watch(props.setting, async current => {
     CameraOptions.isUpFixed = props.setting.fixedUp;
     CameraOptions.MOTIONS = CameraOptions.MOTION_STORAGE[Number(CameraOptions.isUpFixed)];
     CameraOptions.reset();
+  }
+});
+
+watch(props, async () => {
+  if (props.updated === true) {
+    console.log("Updated...", props.updated);
+    emit("update-done");
   }
 });
 
@@ -229,9 +238,13 @@ function addPlanetToScene(planetInfo, baseobj = "scene", hasRing = false, hasLig
 addPlanetToScene.textureLoader = new THREE.TextureLoader();
 
 function autoresize() {
-  console.dir(rendererDom.value.parentElement);
-  const width = window.innerWidth - 520;
-  const height = window.innerHeight - 120;
+  let width = window.innerWidth - 370;
+  if (window.innerWidth > 1180) width -= 150;
+  let height = window.innerHeight - 120;
+  if (width < 0 || height <= 0) {
+    width = 0;
+    height = 1;
+  }
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
@@ -281,10 +294,15 @@ function prepareForAnimation() {
   setupEventHandler();
 }
 
+function updatePlanets(planetInfo) {
+  addPlanetToScene(...planetInfo);
+  generateOrbits(planetInfo[0].distance);
+}
+
 onBeforeMount(() => {
   setupSceneBackground(scene);
-  planetsInfromation.forEach(item => addPlanetToScene(...item));
-  planetsInfromation.forEach(item => generateOrbits(item[0].distance));
+  planetsInformation.forEach(item => addPlanetToScene(...item));
+  planetsInformation.forEach(item => generateOrbits(item[0].distance));
 });
 
 onMounted(() => {

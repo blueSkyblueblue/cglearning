@@ -1,5 +1,4 @@
 <script setup>
-import { defineProps } from "vue";
 import { RouterLink } from "vue-router";
 
 defineProps({ links: Array });
@@ -51,6 +50,7 @@ main .main {
 }
 
 .control-panel {
+  position: relative;
   flex: initial;
   width: 300px;
   height: calc(100vh - 120px);

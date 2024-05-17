@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////
-const planetsInfomation = [
+const planetsInformation = [
   [
     {
       radius: 10,
@@ -150,4 +150,4 @@ const planetsInfomation = [
 
 //////////////////////////////////////////////////
 
-export default planetsInfomation;
+export default planetsInformation;

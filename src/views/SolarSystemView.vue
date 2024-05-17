@@ -3,29 +3,13 @@ import PageTemplate from "@/components/PageTemplate.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import SolarSystem from "@/components/SolarSystem.vue";
 import SolarSystemControlPanel from "@/components/SolarSystemControlPanel.vue";
+import planetsInformation from "@/components/js/PlanetsInformation.js";
 import { ref } from "vue";
 
 const setting = ref({ fixedUp: false, showOrbit: false });
-const controlPanel = ref(null);
 const additionalLinks = [{ path: "/three-view", text: "Three View" }];
 
-// function toggleFullScreen() {
-//   console.log(controlPanel.value);
-//   controlPanel.value.classList.toggle("solarsystem-hidden");
-//   toggleFullScreen.isFull.value = !toggleFullScreen.isFull.value;
-// }
-// toggleFullScreen.isFull = ref(false);
-
-// window.addEventListener("keydown", e => {
-//   if (e.key === "f" && e.ctrlKey === true) {
-//     e.preventDefault();
-//     toggleFullScreen();
-//     console.log("Post Event (fullscreen)", toggleFullScreen.isFull.value);
-//   }
-// });
-
 function onProcessSetting(e_setting) {
-  console.log(e_setting);
   for (let key in setting.value) {
     setting.value[key] = e_setting[key];
   }
@@ -41,7 +25,7 @@ function onProcessSetting(e_setting) {
       <SolarSystemControlPanel @setting-change="onProcessSetting" />
     </template>
     <template v-slot:content>
-      <SolarSystem :setting="setting" />
+      <SolarSystem :setting="setting" :planets="planetsInformation" />
     </template>
   </PageTemplate>
 </template>

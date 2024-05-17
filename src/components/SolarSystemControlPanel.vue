@@ -1,5 +1,7 @@
 <script setup>
-import { defineEmits, ref } from "vue";
+import { defineAsyncComponent, ref } from "vue";
+
+const BottomLink = defineAsyncComponent(() => import("./BottomLink.vue"));
 
 const emit = defineEmits(["setting-change"]);
 const setting = ref({ fixedUp: false, showOrbit: false });
@@ -23,20 +25,21 @@ function toggleCamera() {
     <button @click="toggleCamera">
       {{ setting.fixedUp ? "Standard Camera" : "Basic Camera" }}
     </button>
+    <BottomLink to="/spaceplayground">Click Here to Play around</BottomLink>
   </nav>
 </template>
 
 <style scoped>
 .control-panel button {
   display: block;
-  border: 1px white solid;
+  border: 0.5px white solid;
   border-radius: 2.5px;
   color: rgb(204, 90, 3);
   background: linear-gradient(to right bottom, rgb(56, 255, 215), rgb(40, 167, 251));
   font-size: 18px;
   width: 90%;
   margin: auto;
-  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
   height: 3rem;
   cursor: pointer;
 }
@@ -46,5 +49,11 @@ function toggleCamera() {
   color: white;
   font-size: 20px;
   transition-duration: 0.15s;
+}
+
+.control-panel {
+  position: relative;
+  padding-top: 1.5em;
+  min-height: calc(100vh - 120px);
 }
 </style>
