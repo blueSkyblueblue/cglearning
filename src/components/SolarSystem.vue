@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, beforeMounted, ref, watch } from "vue";
+import { onMounted, onBeforeMount, ref, watch } from "vue";
 import * as THREE from "three";
 import planetsInfromation from "./js/PlanetsInformation.js";
 
@@ -281,7 +281,7 @@ function prepareForAnimation() {
   setupEventHandler();
 }
 
-beforeMounted(() => {
+onBeforeMount(() => {
   setupSceneBackground(scene);
   planetsInfromation.forEach(item => addPlanetToScene(...item));
   planetsInfromation.forEach(item => generateOrbits(item[0].distance));
