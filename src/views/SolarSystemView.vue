@@ -1,74 +1,53 @@
 <script setup>
+import PageTemplate from "@/components/PageTemplate.vue";
+import PageHeader from "@/components/PageHeader.vue";
 import SolarSystem from "@/components/SolarSystem.vue";
+import SolarSystemControlPanel from "@/components/SolarSystemControlPanel.vue";
 import { ref } from "vue";
 
 const setting = ref({ fixedUp: false, showOrbit: false });
 const controlPanel = ref(null);
+const additionalLinks = [{ path: "/three-view", text: "Three View" }];
 
-function toggleFullScreen() {
-  controlPanel.value.classList.toggle("solarsystem-hidden");
-  toggleFullScreen.isFull.value = !toggleFullScreen.isFull.value;
-}
-toggleFullScreen.isFull = ref(false);
+// function toggleFullScreen() {
+//   console.log(controlPanel.value);
+//   controlPanel.value.classList.toggle("solarsystem-hidden");
+//   toggleFullScreen.isFull.value = !toggleFullScreen.isFull.value;
+// }
+// toggleFullScreen.isFull = ref(false);
 
-window.addEventListener("keydown", e => {
-  if (e.key === "f" && e.ctrlKey === true) {
-    e.preventDefault();
-    toggleFullScreen();
-    console.log("Post Event (fullscreen)", toggleFullScreen.isFull.value);
+// window.addEventListener("keydown", e => {
+//   if (e.key === "f" && e.ctrlKey === true) {
+//     e.preventDefault();
+//     toggleFullScreen();
+//     console.log("Post Event (fullscreen)", toggleFullScreen.isFull.value);
+//   }
+// });
+
+function onProcessSetting(e_setting) {
+  console.log(e_setting);
+  for (let key in setting.value) {
+    setting.value[key] = e_setting[key];
   }
-});
+}
 </script>
 
 <template>
-  <div class="app-container">
-    <nav class="control-panel" ref="controlPanel">
-      <button @click="setting.showOrbit = !setting.showOrbit">
-        {{ setting.showOrbit ? "Disable Orbit" : "Enable Orbit" }}
-      </button>
-      <button @click="setting.fixedUp = !setting.fixedUp">
-        {{ setting.fixedUp ? "Standard Camera" : "Basic Camera" }}
-      </button>
-    </nav>
-    <SolarSystem :setting="setting" :fullscreen="toggleFullScreen.isFull" />
-  </div>
+  <PageTemplate class="background" :links="additionalLinks">
+    <template v-slot:header>
+      <PageHeader>Solar System Travel</PageHeader>
+    </template>
+    <template class="controls" v-slot:controls>
+      <SolarSystemControlPanel @setting-change="onProcessSetting" />
+    </template>
+    <template v-slot:content>
+      <SolarSystem :setting="setting" />
+    </template>
+  </PageTemplate>
 </template>
 
 <style scoped>
-.app-container {
-  display: flex;
-  flex-direction: row;
-}
-
-.control-panel {
-  flex: auto;
-  border: 1px solid black;
-}
-
-.control-panel button {
-  display: block;
-  border: 1px white solid;
-  border-radius: 2.5px;
-  color: rgb(204, 90, 3);
-  background: linear-gradient(to right bottom, rgb(56, 255, 215), rgb(40, 167, 251));
-  font-size: 18px;
-  width: 90%;
-  margin: auto;
-  margin-top: 1.5rem;
-  height: 3rem;
-  cursor: pointer;
-}
-
-.control-panel button:hover {
-  background: linear-gradient(to right bottom, rgb(157, 248, 229), rgb(80, 185, 255));
-  color: white;
-  font-size: 20px;
-  transition-duration: 0.15s;
-}
-</style>
-
-<style>
-.solarsystem-hidden {
-  display: none;
+.background {
+  background-image: linear-gradient(to bottom, rgb(209, 216, 168), rgb(77, 169, 109));
 }
 </style>

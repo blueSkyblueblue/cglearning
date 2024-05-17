@@ -139,4 +139,57 @@ nav > a:hover {
   transform: scale(1.1);
   background-color: color-mix(in srgb, rgb(89, 184, 97) 90%, white);
 }
+
+@media (max-height: 750px) {
+  .header {
+    height: 280px;
+  }
+
+  .introduction {
+    height: auto;
+  }
+
+  .introduction > .block {
+    height: 400px;
+  }
+}
+
+@media (max-width: 850px) and (min-width: 520px) {
+  .introduction {
+    height: auto;
+    flex-direction: column;
+    row-gap: 40px;
+  }
+
+  .introduction > .block {
+    width: 70%;
+    height: 400px;
+  }
+}
+
+@media (max-width: 520px) {
+  .padding {
+    display: none;
+  }
+
+  .padding:first-of-type {
+    display: block;
+  }
+
+  nav {
+    flex-direction: column;
+    row-gap: 10px;
+  }
+
+  .introduction {
+    height: auto;
+    flex-direction: column;
+    row-gap: 40px;
+  }
+
+  .introduction > .block {
+    width: 70%;
+    height: 400px;
+  }
+}
 </style>

@@ -1,44 +1,40 @@
 <script setup>
-import { onBeforeMount, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import * as THREE from "three";
 import planetsInfromation from "./js/PlanetsInformation.js";
 
-const appSetting = defineProps(["setting", "fullscreen"]);
-console.log(appSetting.setting);
+const props = defineProps(["setting", "fullscreen"]);
 
-const container = ref(null);
+const rendererDom = ref(null);
+let renderer = null;
+
 const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(computeEdgeLength(), computeEdgeLength());
-renderer.setPixelRatio(window.devicePixelRatio);
-const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
-camera.position.set(0, 5, 100);
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 800);
+
 const planets = [];
 const orbits = [];
 
-// setInterval(() => console.log(camera.getWorldDirection(new THREE.Vector3())), 1000);
+// watch(props.fullscreen, async current => {
+//   console.log("Receive Event (fullscreen)", current);
 
-watch(appSetting.fullscreen, async current => {
-  console.log("Receive Event (fullscreen)", current);
+//   let width = window.innerWidth;
+//   let height = window.innerHeight;
+//   if (current === false) {
+//     width = computeEdgeLength();
+//     height = computeEdgeLength();
+//   }
 
-  let width = window.innerWidth;
-  let height = window.innerHeight;
-  if (current === false) {
-    width = computeEdgeLength();
-    height = computeEdgeLength();
-  }
+//   renderer.setSize(width, height);
+//   camera.aspect = width / height;
+//   camera.updateProjectionMatrix();
+// });
 
-  renderer.setSize(width, height);
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-});
-
-let currentOrbitState = appSetting.setting.showOrbit;
-watch(appSetting.setting, async current => {
+let currentOrbitState = props.setting.showOrbit;
+watch(props.setting, async current => {
   console.log("current", current);
 
-  if (appSetting.setting.showOrbit !== currentOrbitState) {
-    currentOrbitState = appSetting.setting.showOrbit;
+  if (props.setting.showOrbit !== currentOrbitState) {
+    currentOrbitState = props.setting.showOrbit;
     if (currentOrbitState === true) {
       planetsInfromation.forEach((item, i) => addOrbitToScene(orbits[i], item[1]));
     } else {
@@ -46,8 +42,8 @@ watch(appSetting.setting, async current => {
     }
   }
 
-  if (appSetting.setting.fixedUp !== CameraOptions.isUpFixed) {
-    CameraOptions.isUpFixed = appSetting.setting.fixedUp;
+  if (props.setting.fixedUp !== CameraOptions.isUpFixed) {
+    CameraOptions.isUpFixed = props.setting.fixedUp;
     CameraOptions.MOTIONS = CameraOptions.MOTION_STORAGE[Number(CameraOptions.isUpFixed)];
     CameraOptions.reset();
   }
@@ -56,7 +52,7 @@ watch(appSetting.setting, async current => {
 class CameraOptions {
   static speed = 30;
   static direction = { pitch: 0, yaw: 0 };
-  static isUpFixed = appSetting.setting.fixedUp;
+  static isUpFixed = props.setting.fixedUp;
   static moving = false;
   static moveFuncs = [];
   static MOTION_STORAGE = [
@@ -117,10 +113,6 @@ class CameraOptions {
     camera.rotateX(yoffset / 720);
     camera.rotateY(xoffset / 720);
   }
-}
-
-function computeEdgeLength() {
-  return Math.min(window.innerWidth, window.innerHeight);
 }
 
 function setupSceneBackground(scene) {
@@ -251,11 +243,24 @@ function addPlanetToScene(planetInfo, baseobj = "scene", hasRing = false, hasLig
 }
 addPlanetToScene.textureLoader = new THREE.TextureLoader();
 
+function autoresize() {
+  console.dir(rendererDom.value.parentElement);
+  const width = window.innerWidth - 520;
+  const height = window.innerHeight - 120;
+  renderer.setSize(width, height);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+}
+
+function setupRenderer() {
+  renderer = new THREE.WebGLRenderer({ canvas: rendererDom.value });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  autoresize();
+  camera.position.set(0, 5, 100);
+}
+
 function setupEventHandler() {
-  window.addEventListener("resize", () => {
-    const edgeLength = computeEdgeLength();
-    renderer.setSize(edgeLength, edgeLength);
-  });
+  window.addEventListener("resize", () => autoresize());
 
   // Camera Transform
   window.addEventListener("keydown", e => {
@@ -286,14 +291,16 @@ function setupEventHandler() {
   });
 }
 
-onBeforeMount(() => {
+function prepareForAnimation() {
+  setupRenderer();
   setupSceneBackground(scene);
   planetsInfromation.forEach(item => addPlanetToScene(...item));
   planetsInfromation.forEach(item => generateOrbits(item[0].distance));
-});
+  setupEventHandler(renderer, camera);
+}
 
 onMounted(() => {
-  container.value.appendChild(renderer.domElement);
+  prepareForAnimation();
 
   let lastTime = 0;
   function animate(time) {
@@ -309,23 +316,17 @@ onMounted(() => {
     renderer.render(scene, camera);
   }
 
-  setupEventHandler(renderer, camera);
   renderer.setAnimationLoop(animate);
 });
 </script>
 
 <template>
-  <div class="container" ref="container"></div>
+  <canvas id="solarsystem-view" ref="rendererDom"></canvas>
 </template>
 
 <style scoped>
-.container {
-  min-width: 80%;
-}
-</style>
-
-<style>
-.container > canvas {
-  margin: auto;
+#solarsystem-view {
+  width: 100%;
+  height: 100%;
 }
 </style>

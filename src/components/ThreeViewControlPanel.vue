@@ -2,21 +2,15 @@
 import { Vector3 } from "three";
 import { ref } from "vue";
 
+const props = defineProps({ vertices: Array, rotation: Vector3 });
+const emit = defineEmits(["tetra-type-changed", "vertices-updated"]);
 const isRegular = ref(true);
-
-defineProps({
-  position: Vector3,
-  rotation: Vector3,
-});
-
 const vertices = [
   new Vector3(-2, -1, 0),
   new Vector3(2, -1, 0),
   new Vector3(0, 1, 2),
   new Vector3(0, 1, -2),
 ];
-
-const emit = defineEmits(["tetra-type-changed"]);
 
 function toggleType() {
   isRegular.value = !isRegular.value;
@@ -27,6 +21,23 @@ function toggleType() {
   else panel.classList.remove("close-vertices-panel");
 
   console.log(panel.clientHeight);
+}
+
+function updateVertices() {
+  const verticesList = document.getElementsByClassName("vertex-item");
+  // const newVertices = [new Vector3(), new Vector3(), new Vector3(), new Vector3()];
+  for (let i = 0; i < vertices.length; i++) {
+    const vertexValues = verticesList[i].getElementsByTagName("input");
+    vertices[i].x = vertexValues[0].value;
+    vertices[i].y = vertexValues[1].value;
+    vertices[i].z = vertexValues[2].value;
+  }
+
+  emit("vertices-updated", vertices);
+}
+
+function radToDeg(radian) {
+  return ((radian * 180) / Math.PI).toFixed(6);
 }
 </script>
 
@@ -60,17 +71,21 @@ function toggleType() {
       </li>
     </ul>
 
-    <button type="button">commit</button>
+    <button type="button" @click="updateVertices">commit</button>
   </div>
 
   <!-- <hr /> -->
-  <div class="section">
-    <div class="item-header">Object Rotation: <em>(read only)</em></div>
-    <div><b>x:</b> <input type="number" :value="rotation.x" disabled /></div>
-    <div><b>y:</b> <input type="number" :value="rotation.y" disabled /></div>
-    <div><b>z:</b> <input type="number" :value="rotation.z" disabled /></div>
+  <div class="section rotation-panel">
+    <div class="item-header">Rotation in degree: <em>(read only)</em></div>
+    <div><span>x:</span> <input type="number" :value="radToDeg(rotation.x)" disabled /></div>
+    <div><span>y:</span> <input type="number" :value="radToDeg(rotation.y)" disabled /></div>
+    <div><span>z:</span> <input type="number" :value="radToDeg(rotation.z)" disabled /></div>
   </div>
   <hr />
+
+  <div class="section">
+    <div class="item-header"></div>
+  </div>
 </template>
 
 <style scoped>
@@ -195,6 +210,12 @@ h3 {
   margin: 10px auto;
   outline: none;
   padding: 0.5em 1.5em;
+}
+
+.rotation-panel > div > span {
+  display: inline-block;
+  width: 1.2em;
+  font-weight: bold;
 }
 </style>
 
