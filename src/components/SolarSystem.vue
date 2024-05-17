@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, beforeMounted, ref, watch } from "vue";
 import * as THREE from "three";
 import planetsInfromation from "./js/PlanetsInformation.js";
 
@@ -13,21 +13,6 @@ const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 800);
 
 const planets = [];
 const orbits = [];
-
-// watch(props.fullscreen, async current => {
-//   console.log("Receive Event (fullscreen)", current);
-
-//   let width = window.innerWidth;
-//   let height = window.innerHeight;
-//   if (current === false) {
-//     width = computeEdgeLength();
-//     height = computeEdgeLength();
-//   }
-
-//   renderer.setSize(width, height);
-//   camera.aspect = width / height;
-//   camera.updateProjectionMatrix();
-// });
 
 let currentOrbitState = props.setting.showOrbit;
 watch(props.setting, async current => {
@@ -293,11 +278,14 @@ function setupEventHandler() {
 
 function prepareForAnimation() {
   setupRenderer();
+  setupEventHandler();
+}
+
+beforeMounted(() => {
   setupSceneBackground(scene);
   planetsInfromation.forEach(item => addPlanetToScene(...item));
   planetsInfromation.forEach(item => generateOrbits(item[0].distance));
-  setupEventHandler(renderer, camera);
-}
+});
 
 onMounted(() => {
   prepareForAnimation();
