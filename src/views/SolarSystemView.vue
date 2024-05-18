@@ -21,7 +21,7 @@ function onProcessSetting(e_setting) {
     <template v-slot:header>
       <PageHeader>Solar System Travel</PageHeader>
     </template>
-    <template class="controls" v-slot:controls>
+    <template v-slot:controls>
       <SolarSystemControlPanel @setting-change="onProcessSetting" />
     </template>
     <template v-slot:content>

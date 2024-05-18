@@ -1,10 +1,14 @@
 <script setup>
-import { defineAsyncComponent, onBeforeMount, onMounted, ref } from "vue";
+import { defineAsyncComponent, onBeforeMount, ref } from "vue";
 
 const BottomLink = defineAsyncComponent(() => import("./BottomLink.vue"));
 const PlanetInfoForm = defineAsyncComponent(() => import("./PlanetInfoForm.vue"));
 const props = defineProps({ planets: Array });
-const planetGalleries = ref([]);
+const emit = defineEmits(["show-orbit", "change-camera", "update-planets"]);
+
+let planetGalleries = ref([]);
+const showOrbit = ref(false);
+const camera = ref(false);
 
 function parse(planet) {
   return {
@@ -15,22 +19,79 @@ function parse(planet) {
   };
 }
 
+function emptyTemplate(name) {
+  return {
+    info: {
+      radius: 5,
+      segments: [32, 16],
+      distance: 18,
+      rotateSpeed: 5,
+      selfRotateSpeed: 0,
+      texture: "textures/earth.jpg",
+      // light: { color: 0xffffff, intensity: 15000 },
+      name,
+    },
+    base: "sun",
+    hasRing: false,
+    hasLight: false,
+  };
+}
+
 onBeforeMount(() => {
   props.planets.forEach(element => planetGalleries.value.push(parse(element)));
   console.log(...planetGalleries.value);
 });
+
+function remove(name) {
+  planetGalleries.value = planetGalleries.value.filter(item => item.info.name !== name);
+  console.log(planetGalleries.value);
+}
+
+let count = 0;
+function newplanet(name) {
+  count++;
+  planetGalleries.value.push(emptyTemplate("planet_" + count));
+}
 </script>
 
 <template>
   <nav class="controls">
     <div class="options">
-      <button>show orbit</button>
-      <button>camera</button>
+      <button
+        @click="
+          () => {
+            showOrbit = !showOrbit;
+            emit('show-orbit', showOrbit);
+          }
+        "
+      >
+        {{ showOrbit ? "disable orbit" : "show orbit" }}
+      </button>
+      <button
+        @click="
+          camera = !camera;
+          emit('change-camera', camera);
+        "
+      >
+        {{ camera ? "camera I" : "camera II" }}
+      </button>
     </div>
     <hr />
     <div class="main">
-      <PlanetInfoForm v-for="item in planetGalleries" v-bind="item"></PlanetInfoForm>
+      <PlanetInfoForm
+        v-for="item in planetGalleries"
+        v-bind="item"
+        @comfirm="
+          e_data => {
+            console.log(e_data);
+            emit('update-planets', e_data);
+          }
+        "
+        @remove="remove"
+      />
+      <button @click="newplanet" id="new-planet-btn">Add New One</button>
     </div>
+    <div class="blank"></div>
     <BottomLink to="/solarsystem">Come back</BottomLink>
   </nav>
 </template>
@@ -43,10 +104,12 @@ hr {
 }
 
 .controls {
-  position: relative;
   padding-top: 0.8em;
   width: 100%;
-  height: calc(100vh - 120px);
+  height: 100%;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 
 .options {
@@ -62,11 +125,31 @@ hr {
   border: none;
   border-radius: 2px;
   color: aliceblue;
+  box-shadow: 0 0 0 0 white;
   background-color: rgb(36, 129, 67);
 }
 
 .options > button:hover {
   cursor: pointer;
   background-color: color-mix(in srgb, rgb(36, 129, 67) 80%, white);
+}
+
+.options > button:active {
+  box-shadow: 0 0 2px 0 rgba(255, 255, 255);
+  background-color: color-mix(in srgb, rgb(36, 129, 67) 72%, white);
+}
+
+#new-planet-btn {
+  display: block;
+  outline: 1px solid orange;
+  border-color: white;
+  border-width: 1px;
+  color: rgb(67, 88, 107);
+  margin-left: 6em;
+  padding: 0.5em 1.5em;
+}
+
+.blank {
+  height: 80%;
 }
 </style>

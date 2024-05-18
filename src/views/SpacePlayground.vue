@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import PageTemplate from "@/components/PageTemplate.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import SolarSystem from "@/components/SolarSystem.vue";
@@ -28,10 +28,22 @@ const planets = ref([
 
 let updated = ref(false);
 
-setInterval(() => {
-  console.log("Ok");
+function toggleOrbit(arg) {
+  setting.value.showOrbit = arg;
+}
+
+function toggleCamera(arg) {
+  setting.value.fixedUp = arg;
+}
+
+function updatePlanets(e_data) {
+  const index = planets.value.findIndex(item => item[0].name === e_data[0].name);
+  if (index >= 0) planets.value[index] = e_data;
+  else planets.value.push(e_data);
+
   updated.value = true;
-}, 1000);
+  console.log("SpacePlaygound: ", planets.value);
+}
 </script>
 
 <template>
@@ -40,7 +52,12 @@ setInterval(() => {
       <PageHeader>Playground [have a good time] 💕</PageHeader>
     </template>
     <template class="controls" v-slot:controls>
-      <PlaygroundControlPanel :planets="planets" />
+      <PlaygroundControlPanel
+        @show-orbit="toggleOrbit"
+        @change-camera="toggleCamera"
+        @update-planets="updatePlanets"
+        :planets="planets"
+      />
     </template>
     <template v-slot:content>
       <SolarSystem

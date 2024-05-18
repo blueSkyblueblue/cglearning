@@ -52,8 +52,10 @@ function toggleCamera() {
 }
 
 .control-panel {
-  position: relative;
   padding-top: 1.5em;
-  min-height: calc(100vh - 120px);
+  min-height: 100%;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 </style>

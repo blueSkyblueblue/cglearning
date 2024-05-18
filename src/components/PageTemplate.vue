@@ -56,9 +56,6 @@ main .main {
   height: calc(100vh - 120px);
   border-radius: 4px;
   background-color: rgb(158, 185, 223);
-  overflow-y: scroll;
-  scrollbar-width: none;
-  scroll-behavior: smooth;
 }
 
 .main-content {

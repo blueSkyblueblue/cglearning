@@ -9,6 +9,7 @@ const props = defineProps({
   updated: { type: Boolean, required: false, default: false },
 });
 
+const viewFocused = ref(true);
 const planetsInformation = props.planets;
 const rendererDom = ref(null);
 let renderer = null;
@@ -18,8 +19,7 @@ const planets = [];
 const orbits = [];
 
 let currentOrbitState = props.setting.showOrbit;
-watch(props.setting, async () => {
-  console.log("current", props.setting);
+watch(props, async () => {
   if (props.setting.showOrbit !== currentOrbitState) {
     currentOrbitState = props.setting.showOrbit;
     if (currentOrbitState === true) {
@@ -34,14 +34,18 @@ watch(props.setting, async () => {
     CameraOptions.MOTIONS = CameraOptions.MOTION_STORAGE[Number(CameraOptions.isUpFixed)];
     CameraOptions.reset();
   }
+
+  if (props.updated === true) updatingSystem();
 });
 
-watch(props, async () => {
-  if (props.updated === true) {
-    console.log("Updated...", props.updated);
-    emit("update-done");
-  }
-});
+function updatingSystem() {
+  console.log("Updating: ----", props.planets);
+  scene.clear();
+  props.planets.forEach(item => addPlanetToScene(...item));
+  props.planets.forEach(item => generateOrbits(item[0].distance));
+  emit("update-done");
+  console.log("Done ---------");
+}
 
 class CameraOptions {
   static speed = 30;
@@ -259,9 +263,14 @@ function setupRenderer() {
 
 function setupEventHandler() {
   window.addEventListener("resize", () => autoresize());
+  window.addEventListener("click", e => {
+    if (e.target === rendererDom.value) viewFocused.value = true;
+    else viewFocused.value = false;
+  });
 
   // Camera Transform
   window.addEventListener("keydown", e => {
+    if (viewFocused.value === false) return;
     if (e.repeat === false) {
       const index = CameraOptions.MOTION_KEYS.indexOf(e.key);
       if (index >= 0) {
@@ -272,6 +281,7 @@ function setupEventHandler() {
   });
 
   window.addEventListener("keyup", e => {
+    if (viewFocused.value === false) return;
     const index = CameraOptions.MOTION_KEYS.indexOf(e.key);
     if (index >= 0) {
       CameraOptions.remove(CameraOptions.MOTIONS[index]);
@@ -294,10 +304,10 @@ function prepareForAnimation() {
   setupEventHandler();
 }
 
-function updatePlanets(planetInfo) {
-  addPlanetToScene(...planetInfo);
-  generateOrbits(planetInfo[0].distance);
-}
+// function updatePlanets(planetInfo) {
+//   addPlanetToScene(...planetInfo);
+//   generateOrbits(planetInfo[0].distance);
+// }
 
 onBeforeMount(() => {
   setupSceneBackground(scene);
@@ -327,12 +337,34 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas id="solarsystem-view" ref="rendererDom"></canvas>
+  <div class="container">
+    <canvas :class="viewFocused ? 'outline-border' : ''" id="solarsystem-view" ref="rendererDom">
+    </canvas>
+    <span v-cloak>{{ viewFocused ? "Focused" : "Lost [click to focus]" }}</span>
+  </div>
 </template>
 
 <style scoped>
 #solarsystem-view {
   width: 100%;
   height: 100%;
+}
+
+.outline-border {
+  outline: 0.2em solid rgb(98, 98, 134);
+  outline-offset: 0.2em;
+}
+
+.container {
+  position: relative;
+}
+
+.container span {
+  display: block;
+  position: absolute;
+  left: 2em;
+  bottom: 1em;
+  color: rgb(121, 188, 148);
+  z-index: 100;
 }
 </style>
