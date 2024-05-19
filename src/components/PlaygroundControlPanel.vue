@@ -3,12 +3,10 @@ import { defineAsyncComponent, onBeforeMount, ref } from "vue";
 
 const BottomLink = defineAsyncComponent(() => import("./BottomLink.vue"));
 const PlanetInfoForm = defineAsyncComponent(() => import("./PlanetInfoForm.vue"));
-const props = defineProps({ planets: Array });
-const emit = defineEmits(["show-orbit", "change-camera", "update-planets"]);
+const props = defineProps({ planets: Array, config: Object });
+defineEmits(["show-orbit", "change-camera", "update-planets"]);
 
 let planetGalleries = ref([]);
-const showOrbit = ref(false);
-const camera = ref(false);
 
 function parse(planet) {
   return {
@@ -57,23 +55,11 @@ function newplanet(name) {
 <template>
   <nav class="controls">
     <div class="options">
-      <button
-        @click="
-          () => {
-            showOrbit = !showOrbit;
-            emit('show-orbit', showOrbit);
-          }
-        "
-      >
-        {{ showOrbit ? "disable orbit" : "show orbit" }}
+      <button @click="$emit('show-orbit')">
+        {{ props.config.orbit ? "disable orbit" : "show orbit" }}
       </button>
-      <button
-        @click="
-          camera = !camera;
-          emit('change-camera', camera);
-        "
-      >
-        {{ camera ? "camera I" : "camera II" }}
+      <button @click="$emit('change-camera')">
+        {{ props.config.fixedCamera ? "camera I" : "camera II" }}
       </button>
     </div>
     <hr />
@@ -84,7 +70,7 @@ function newplanet(name) {
         @comfirm="
           e_data => {
             console.log(e_data);
-            emit('update-planets', e_data);
+            $emit('update-planets', e_data);
           }
         "
         @remove="remove"

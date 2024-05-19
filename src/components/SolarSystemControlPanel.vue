@@ -2,28 +2,17 @@
 import { defineAsyncComponent, ref } from "vue";
 
 const BottomLink = defineAsyncComponent(() => import("./BottomLink.vue"));
-
-const emit = defineEmits(["setting-change"]);
-const setting = ref({ fixedUp: false, showOrbit: false });
-
-function toggleOrbit() {
-  setting.value.showOrbit = !setting.value.showOrbit;
-  emit("setting-change", setting.value);
-}
-
-function toggleCamera() {
-  setting.value.fixedUp = !setting.value.fixedUp;
-  emit("setting-change", setting.value);
-}
+defineProps(["setting"]);
+defineEmits(["setting-change"]);
 </script>
 
 <template>
   <nav class="control-panel">
-    <button @click="toggleOrbit">
-      {{ setting.showOrbit ? "Disable Orbit" : "Enable Orbit" }}
+    <button @click="$emit('setting-change', 'orbit')">
+      {{ setting.orbit ? "Disable Orbit" : "Enable Orbit" }}
     </button>
-    <button @click="toggleCamera">
-      {{ setting.fixedUp ? "Standard Camera" : "Basic Camera" }}
+    <button @click="$emit('setting-change', 'fixedCamera')">
+      {{ setting.fixedCamera ? "Fixed Camera" : "Rotated Camera" }}
     </button>
     <BottomLink to="/spaceplayground">Click Here to Play around</BottomLink>
   </nav>

@@ -22,7 +22,12 @@ const router = createRouter({
     {
       path: "/spaceplayground",
       name: "spaceplayground",
-      component: () => import("@/views/SpacePlayground.vue"),
+      component: () => import("@/views/SpacePlaygroundView.vue"),
+    },
+    {
+      path: "/planetsspace",
+      name: "/planetsspace",
+      component: () => import("@/views/PlanetsSpaceView.vue"),
     },
   ],
 });

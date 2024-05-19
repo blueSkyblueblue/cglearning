@@ -2,11 +2,10 @@
 import { ref, watch } from "vue";
 import PageTemplate from "@/components/PageTemplate.vue";
 import PageHeader from "@/components/PageHeader.vue";
-import SolarSystem from "@/components/SolarSystem.vue";
 import PlaygroundControlPanel from "@/components/PlaygroundControlPanel.vue";
+import PlanetsSpace from "@/components/PlanetsSpace.vue";
 
 const additionalLinks = [{ path: "/three-view", text: "Three View" }];
-const setting = ref({ fixedUp: false, showOrbit: false });
 
 const planets = ref([
   [
@@ -26,15 +25,25 @@ const planets = ref([
   ],
 ]);
 
+const size = ref({ width: 100, height: 100 });
+const config = ref({ orbit: false, fixedCamera: false });
+
 let updated = ref(false);
 
-function toggleOrbit(arg) {
-  setting.value.showOrbit = arg;
+function recalcSize() {
+  let width = window.innerWidth - 370;
+  if (window.innerWidth > 1180) width -= 150;
+  let height = window.innerHeight - 120;
+  if (width < 0) width = 0;
+  if (height <= 0) height = 1;
+  size.value.width = width;
+  size.value.height = height;
+
+  console.log(size.value);
 }
 
-function toggleCamera(arg) {
-  setting.value.fixedUp = arg;
-}
+recalcSize();
+window.addEventListener("resize", recalcSize);
 
 function updatePlanets(e_data) {
   const index = planets.value.findIndex(item => item[0].name === e_data[0].name);
@@ -53,19 +62,15 @@ function updatePlanets(e_data) {
     </template>
     <template class="controls" v-slot:controls>
       <PlaygroundControlPanel
-        @show-orbit="toggleOrbit"
-        @change-camera="toggleCamera"
+        @show-orbit="config.orbit = !config.orbit"
+        @change-camera="config.fixedCamera = !config.fixedCamera"
         @update-planets="updatePlanets"
         :planets="planets"
+        :config="config"
       />
     </template>
     <template v-slot:content>
-      <SolarSystem
-        :setting="setting"
-        :planets="planets"
-        :updated="updated"
-        @update-done="updated = false"
-      />
+      <PlanetsSpace :size="size" :config="config" />
     </template>
   </PageTemplate>
 </template>
