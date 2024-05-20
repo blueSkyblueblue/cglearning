@@ -20,15 +20,20 @@ class SimpleScene {
       item.objs.mesh.rotation.y += ts * item.info.rotationSpeed;
       item.objs.system.rotation.y += ts * item.info.revolutionSpeed;
     });
+    return this;
   }
 
   reset(planets) {
-    for (const planet of planets) this.add(planet);
+    console.log(planets);
+    this.clear();
+    planets.forEach(planet => this.add(planet));
+    return this;
   }
 
   clear() {
     this.inst.clear();
     this.planets.length = 0;
+    return this;
   }
 
   configOrbits(show = false) {
@@ -37,6 +42,8 @@ class SimpleScene {
       if (show) item.objs.system.add(item.objs.orbit);
       else item.objs.system.remove(item.objs.orbit);
     });
+
+    return this;
   }
 
   add(planet) {
@@ -82,6 +89,8 @@ class SimpleScene {
 
       return true;
     });
+
+    return this;
   }
 
   static #generateOrbit(radius) {

@@ -6,32 +6,27 @@ const PlanetInfoForm = defineAsyncComponent(() => import("./PlanetInfoForm.vue")
 const props = defineProps({ planets: Array, config: Object });
 defineEmits(["show-orbit", "change-camera", "update-planets"]);
 
-let planetGalleries = ref([]);
+const planetGalleries = ref([]);
+const formData = ref();
 
 function parse(planet) {
   return {
-    info: planet[0],
+    ...planet[0],
     base: planet[1],
-    hasRing: planet[2],
-    hasLight: planet[3],
   };
 }
 
 function emptyTemplate(name) {
   return {
-    info: {
-      radius: 5,
-      segments: [32, 16],
-      distance: 18,
-      rotateSpeed: 5,
-      selfRotateSpeed: 0,
-      texture: "textures/earth.jpg",
-      // light: { color: 0xffffff, intensity: 15000 },
-      name,
-    },
+    radius: 5,
+    segments: [32, 16],
+    distance: 18,
+    rotateSpeed: 5,
+    selfRotateSpeed: 0,
+    texture: "textures/earth.jpg",
+    // light: { color: 0xffffff, intensity: 15000 },
+    name,
     base: "sun",
-    hasRing: false,
-    hasLight: false,
   };
 }
 
@@ -66,7 +61,7 @@ function newplanet(name) {
     <div class="main">
       <PlanetInfoForm
         v-for="item in planetGalleries"
-        v-bind="item"
+        :info="item"
         @comfirm="
           e_data => {
             console.log(e_data);

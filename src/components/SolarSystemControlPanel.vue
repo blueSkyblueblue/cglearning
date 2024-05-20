@@ -14,6 +14,10 @@ defineEmits(["setting-change"]);
     <button @click="$emit('setting-change', 'fixedCamera')">
       {{ setting.fixedCamera ? "Fixed Camera" : "Rotated Camera" }}
     </button>
+    <hr />
+    <div class="message">
+      press <span class="note">&lt;Shift + F&gt;</span> to make the view fullscree
+    </div>
     <BottomLink to="/spaceplayground">Click Here to Play around</BottomLink>
   </nav>
 </template>
@@ -46,5 +50,21 @@ defineEmits(["setting-change"]);
   overflow-y: scroll;
   scrollbar-width: none;
   scroll-behavior: smooth;
+}
+
+.message {
+  font-size: 18px;
+  margin-top: 1em;
+  background-color: rgb(76, 35, 35);
+  padding: 0.4em 1em;
+  color: rgb(86, 198, 45);
+}
+
+.note {
+  color: salmon;
+  font-style: italic;
+  background-color: rgb(106, 89, 68);
+  border-radius: 2px;
+  padding: 0 0.2em;
 }
 </style>

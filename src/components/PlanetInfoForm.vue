@@ -1,19 +1,39 @@
 <script setup>
 import { ref } from "vue";
 
-const props = defineProps(["info", "base", "hasRing", "hasLight"]);
+const props = defineProps(["info"]);
 const emit = defineEmits(["remove", "comfirm"]);
 
-const n_base = ref(props.base);
-const n_hasring = ref(props.hasRing);
-const n_haslight = ref(props.hasLight);
-const n_info = ref({
-  radius: props.info.radius,
-  distance: props.info.distance,
-  segments: props.info.segments[0] + ", " + props.info.segments[1],
-  rotateSpeed: props.info.rotateSpeed,
-  selfRotateSpeed: props.info.selfRotateSpeed,
-});
+// const n_base = ref(props.base);
+// const n_hasring = ref(props.hasRing);
+// const n_haslight = ref(props.hasLight);
+// const n_info = ref({
+//   radius: props.info.radius,
+//   distance: props.info.distance,
+//   segments: props.info.segments[0] + ", " + props.info.segments[1],
+//   rotateSpeed: props.info.rotateSpeed,
+//   selfRotateSpeed: props.info.selfRotateSpeed,
+// });
+
+function emptyTemplate(name) {
+  return {
+    radius: 5,
+    segments: [32, 16],
+    distance: 18,
+    rotateSpeed: 5,
+    selfRotateSpeed: 0,
+    texture: "textures/earth.jpg",
+    light: { color: 0xffffff, intensity: 15000 },
+    name,
+    base: "sun",
+  };
+}
+
+const n_info = ref(emptyTemplate("test-1"));
+const hasRing = ref(false);
+const hasLight = ref(false);
+hasRing.value = n_info.ring ? true : false;
+hasLight.value = n_info.light ? true : false;
 
 function hexadecimal(value) {
   return "0x" + value.toString(16).toUpperCase().padStart(6, "0");
@@ -23,24 +43,24 @@ function segmentsStringToArray() {
   return n_info.value.segments.split(",").map(item => parseInt(item));
 }
 
-function combine() {
-  const temp = n_info.value;
-  return [
-    {
-      radius: temp.radius,
-      segments: segmentsStringToArray(temp.segments),
-      distance: temp.distance,
-      rotateSpeed: temp.rotateSpeed,
-      selfRotateSpeed: temp.selfRotateSpeed,
-      texture: "textures/sun.jpg",
-      light: { color: 0xffffff, intensity: 15000 },
-      name: props.info.name,
-    },
-    n_base.value,
-    n_hasring.value,
-    n_haslight.value,
-  ];
-}
+// function combine() {
+//   const temp = n_info.value;
+//   return [
+//     {
+//       radius: temp.radius,
+//       segments: segmentsStringToArray(temp.segments),
+//       distance: temp.distance,
+//       rotateSpeed: temp.rotateSpeed,
+//       selfRotateSpeed: temp.selfRotateSpeed,
+//       texture: "textures/sun.jpg",
+//       light: { color: 0xffffff, intensity: 15000 },
+//       name: props.info.name,
+//     },
+//     n_base.value,
+//     n_hasring.value,
+//     n_haslight.value,
+//   ];
+// }
 
 function remove() {
   emit("remove", props.info.name);
@@ -54,79 +74,79 @@ function comfirm() {
 <template>
   <div class="form">
     <div class="plt-name">
-      name: <span class="colored">{{ info.name }}</span>
-      <span class="icon" @click="remove"></span>
+      name: <span class="colored">{{ n_info.name }}</span>
+      <span class="icon" @click="$emit('remove', n_info.name)"></span>
     </div>
     <div class="message">
       <div class="base-obj flex">
-        <label :for="info.name">base: </label>
-        <input v-model="n_base" :id="info.name" type="text" />
+        <label :for="n_info.name">base: </label>
+        <input v-model="n_info.base" :id="n_info.name" type="text" />
       </div>
       <div class="options">
         <div class="flex">
-          <label :for="info.name + '-ring'">has ring: </label>
-          <input v-model.boolean="n_hasring" :id="info.name + '-ring'" type="checkbox" />
+          <label :for="n_info.name + '-ring'">has ring: </label>
+          <input v-model.boolean="hasRing" :id="n_info.name + '-ring'" type="checkbox" />
         </div>
         <div class="flex">
-          <label :for="info.name + '-light'">has light: </label>
-          <input v-model.boolean="n_haslight" :id="info.name + '-light'" type="checkbox" />
+          <label :for="n_info.name + '-light'">has light: </label>
+          <input v-model.boolean="hasLight" :id="n_info.name + '-light'" type="checkbox" />
         </div>
       </div>
       <div class="properties">
         <div class="flex">
-          <label :for="info.name + '-radius'">radius: </label>
+          <label :for="n_info.name + '-radius'">radius: </label>
           <input
             v-model.number="n_info.radius"
-            :id="info.name + '-radius'"
+            :id="n_info.name + '-radius'"
             type="number"
             step="0.1"
           />
         </div>
-        <div class="flex" v-if="info.segments">
-          <label :for="info.name + '-seg'">segments: </label>
-          <input v-model="n_info.segments" :id="info.name + '-seg'" type="text" />
+        <div class="flex" v-if="n_info.segments">
+          <label :for="n_info.name + '-seg'">segments: </label>
+          <input v-model="n_info.segments" :id="n_info.name + '-seg'" type="text" />
         </div>
         <div class="flex">
-          <label :for="info.name + '-dis'">distance: </label>
+          <label :for="n_info.name + '-dis'">distance: </label>
           <input
             v-model.number="n_info.distance"
-            :id="info.name + '-dis'"
+            :id="n_info.name + '-dis'"
             type="number"
             step="0.1"
           />
         </div>
         <div class="flex">
-          <label :for="info.name + '-rot'">rotation speed: </label>
+          <label :for="n_info.name + '-rot'">rotation speed: </label>
           <input
             v-model.number="n_info.rotateSpeed"
-            :id="info.name + '-rot'"
+            :id="n_info.name + '-rot'"
             type="number"
             step="0.1"
           />
         </div>
         <div class="flex">
-          <label :for="info.name + '-srot'">self rotation speed: </label>
+          <label :for="n_info.name + '-srot'">self rotation speed: </label>
           <input
             v-model.number="n_info.selfRotateSpeed"
-            :id="info.name + '-srot'"
+            :id="n_info.name + '-srot'"
             type="number"
             step="0.1"
           />
         </div>
-        <div v-if="info.texture">texture: {{ info.texture }}</div>
-        <div v-else class="flex">color: {{ info.color }}</div>
+        <div v-if="n_info.texture">texture: {{ n_info.texture }}</div>
+        <div v-else class="flex">color: {{ n_info.color }}</div>
         <div v-if="hasLight">
           light: &nbsp;{
           <div class="indent">
-            <div>color : {{ hexadecimal(info.light.color) }}</div>
-            <div>intensity : {{ info.light.intensity }}</div>
+            <div>color : {{ hexadecimal(n_info.light.color) }}</div>
+            <div>intensity : {{ n_info.light.intensity }}</div>
           </div>
           }
         </div>
         <div v-if="hasRing">
           ring: &nbsp;
           <div class="indent">
-            <div v-for="(item, key) in info.ring">{{ key }} : {{ item }}</div>
+            <div v-for="(item, key) in n_info.ring">{{ key }} : {{ item }}</div>
           </div>
         </div>
       </div>
@@ -172,8 +192,10 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
 }
 
-input[type="number"] {
-  -moz-appearance: textfield;
+@supports (-moz-appearance: none) {
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 .form {
