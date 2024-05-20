@@ -1,158 +1,263 @@
 <script setup>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
+import InputTemplate from "./js/InputTemplate.js";
 
 const props = defineProps(["info"]);
 const emit = defineEmits(["remove", "comfirm"]);
 
-// const n_base = ref(props.base);
-// const n_hasring = ref(props.hasRing);
-// const n_haslight = ref(props.hasLight);
-// const n_info = ref({
-//   radius: props.info.radius,
-//   distance: props.info.distance,
-//   segments: props.info.segments[0] + ", " + props.info.segments[1],
-//   rotateSpeed: props.info.rotateSpeed,
-//   selfRotateSpeed: props.info.selfRotateSpeed,
-// });
-
-function emptyTemplate(name) {
-  return {
-    radius: 5,
-    segments: [32, 16],
-    distance: 18,
-    rotateSpeed: 5,
-    selfRotateSpeed: 0,
-    texture: "textures/earth.jpg",
-    light: { color: 0xffffff, intensity: 15000 },
-    name,
-    base: "sun",
-  };
-}
-
-const n_info = ref(emptyTemplate("test-1"));
-const hasRing = ref(false);
+console.log(props.info);
+const temp = reactive(new InputTemplate().from(props.info));
 const hasLight = ref(false);
-hasRing.value = n_info.ring ? true : false;
-hasLight.value = n_info.light ? true : false;
+const hasRing = ref(false);
+const useTexture = reactive({ planet: false, ring: false });
 
-function hexadecimal(value) {
-  return "0x" + value.toString(16).toUpperCase().padStart(6, "0");
-}
+useTexture.planet = temp.texture ? true : false;
+useTexture.ring = temp.ring?.texture ? true : false;
 
-function segmentsStringToArray() {
-  return n_info.value.segments.split(",").map(item => parseInt(item));
-}
-
-// function combine() {
-//   const temp = n_info.value;
-//   return [
-//     {
-//       radius: temp.radius,
-//       segments: segmentsStringToArray(temp.segments),
-//       distance: temp.distance,
-//       rotateSpeed: temp.rotateSpeed,
-//       selfRotateSpeed: temp.selfRotateSpeed,
-//       texture: "textures/sun.jpg",
-//       light: { color: 0xffffff, intensity: 15000 },
-//       name: props.info.name,
-//     },
-//     n_base.value,
-//     n_hasring.value,
-//     n_haslight.value,
-//   ];
-// }
-
-function remove() {
-  emit("remove", props.info.name);
-}
+hasLight.value = temp.light ? true : false;
+hasRing.value = temp.ring ? true : false;
 
 function comfirm() {
-  emit("comfirm", combine());
+  if (!temp.isValid()) return;
+  emit("comfirm", temp.generate(useTexture, hasLight, hasRing));
+}
+
+function toggleLight() {
+  if (hasLight.value) {
+    hasLight.value = false;
+    temp.light = null;
+  } else {
+    hasLight.value = true;
+    temp.light = {};
+  }
+}
+
+function toggleRing() {
+  if (hasRing.value) {
+    hasRing.value = false;
+    temp.ring = null;
+  } else {
+    hasRing.value = true;
+    temp.ring = {};
+  }
+}
+
+function colorToString(color) {
+  if (color && typeof color === "number") return "0x" + color.toString(16).padStart(6, 0);
+  return "";
+}
+
+function updateSegments(e) {
+  const info = e.target.value.trim();
+  if (e || e === "initial" || e === "unset") temp.segments = null;
+  else {
+    temp.segments = info.split(",").map(item => parseInt(item));
+  }
+}
+
+function segmentsInfo() {
+  if (temp.segments) return `[${temp.segments[0]}, ${temp.segments[1]}]`;
+  else return "";
 }
 </script>
 
 <template>
   <div class="form">
     <div class="plt-name">
-      name: <span class="colored">{{ n_info.name }}</span>
-      <span class="icon" @click="$emit('remove', n_info.name)"></span>
+      Name: <span class="colored">{{ temp.name }}</span>
+      <span class="icon" @click="$emit('remove', temp.name)"></span>
     </div>
     <div class="message">
-      <div class="base-obj flex">
-        <label :for="n_info.name">base: </label>
-        <input v-model="n_info.base" :id="n_info.name" type="text" />
+      <div class="input-wapper">
+        <span class="required">radius : </span>
+        <input
+          type="text"
+          :value="temp.radius"
+          @change="e => (temp.radius = parseFloat(e.target.value))"
+        />
       </div>
-      <div class="options">
-        <div class="flex">
-          <label :for="n_info.name + '-ring'">has ring: </label>
-          <input v-model.boolean="hasRing" :id="n_info.name + '-ring'" type="checkbox" />
+      <div class="input-wapper">
+        <span class="required">base : </span>
+        <input type="text" :value="temp.base" @change="e => (temp.base = e.target.value.trim())" />
+      </div>
+      <div class="input-wapper">
+        <span class="required">distance : </span>
+        <input
+          type="text"
+          :value="temp.distance"
+          @change="e => (temp.distance = parseFloat(e.target.value))"
+        />
+      </div>
+      <div class="input-wapper">
+        <template v-if="useTexture.planet">
+          <span class="required"
+            >texture
+            <span class="color-control" @click="useTexture.planet = !useTexture.planet"
+              >[/color]</span
+            >
+            :
+          </span>
+          <input
+            type="text"
+            :value="temp.texture"
+            @change="e => (temp.texture = e.target.value.trim())"
+          />
+        </template>
+        <template v-else>
+          <span class="required"
+            >color
+            <span class="color-control" @click="useTexture.planet = !useTexture.planet"
+              >[/texture]</span
+            >
+            :
+          </span>
+          <input
+            type="text"
+            :value="colorToString(temp.color)"
+            @change="e => (temp.color = parseInt(e.target.value, 16))"
+          />
+        </template>
+      </div>
+      <div class="input-wapper">
+        <span>rotationSpeed : </span>
+        <input
+          type="text"
+          :value="temp.rotationSpeed"
+          @change="e => (temp.rotationSpeed = parseFloat(e.target.value))"
+        />
+      </div>
+      <div class="input-wapper">
+        <span>revolutionSpeed : </span>
+        <input
+          type="text"
+          :value="temp.revolutionSpeed"
+          @change="e => (temp.revolutionSpeed = parseFloat(e.target.value))"
+        />
+      </div>
+      <div class="input-wapper">
+        <span>has light : </span>
+        <input type="checkbox" :checked="hasLight" @change="toggleLight" />
+      </div>
+      <div class="indented" ref="lightPanel" :class="hasLight ? 'expand' : ''">
+        <div class="input-wapper">
+          <span class="required">color : </span>
+          <input
+            type="text"
+            :value="colorToString(temp.light?.color)"
+            @change="e => (temp.light.color = parseInt(e.target.value, 16))"
+          />
         </div>
-        <div class="flex">
-          <label :for="n_info.name + '-light'">has light: </label>
-          <input v-model.boolean="hasLight" :id="n_info.name + '-light'" type="checkbox" />
+        <div class="input-wapper">
+          <span class="required">intensity : </span>
+          <input
+            type="text"
+            :value="temp.light?.intensity"
+            @change="e => (temp.light.intensity = parseFloat(e.target.value))"
+          />
         </div>
       </div>
-      <div class="properties">
-        <div class="flex">
-          <label :for="n_info.name + '-radius'">radius: </label>
+      <div class="input-wapper">
+        <span>has ring : </span>
+        <input type="checkbox" :checked="hasRing" @change="toggleRing" />
+      </div>
+      <div class="indented" :class="hasRing ? 'expand' : ''">
+        <div class="input-wapper">
+          <span class="required">innerRadius : </span>
           <input
-            v-model.number="n_info.radius"
-            :id="n_info.name + '-radius'"
-            type="number"
-            step="0.1"
+            type="text"
+            :value="temp.ring?.innerRadius || ''"
+            @change="e => (temp.ring.innerRadius = parseFloat(e.target.value))"
           />
         </div>
-        <div class="flex" v-if="n_info.segments">
-          <label :for="n_info.name + '-seg'">segments: </label>
-          <input v-model="n_info.segments" :id="n_info.name + '-seg'" type="text" />
-        </div>
-        <div class="flex">
-          <label :for="n_info.name + '-dis'">distance: </label>
+        <div class="input-wapper">
+          <span class="required">outerRadius : </span>
           <input
-            v-model.number="n_info.distance"
-            :id="n_info.name + '-dis'"
-            type="number"
-            step="0.1"
+            type="text"
+            :value="temp.ring?.outerRadius || ''"
+            @change="e => (temp.ring.outerRadius = parseFloat(e.target.value))"
           />
         </div>
-        <div class="flex">
-          <label :for="n_info.name + '-rot'">rotation speed: </label>
-          <input
-            v-model.number="n_info.rotateSpeed"
-            :id="n_info.name + '-rot'"
-            type="number"
-            step="0.1"
-          />
+        <div class="input-wapper">
+          <template v-if="useTexture.ring">
+            <span class="required"
+              >texture
+              <span class="color-control" @click="useTexture.ring = !useTexture.ring"
+                >[/color]</span
+              >
+              :
+            </span>
+            <input
+              type="text"
+              :value="temp.ring?.texture || ''"
+              @change="e => (temp.ring.texture = e.target.value.trim())"
+            />
+          </template>
+          <template v-else>
+            <span class="required"
+              >color
+              <span class="color-control" @click="useTexture.ring = !useTexture.ring"
+                >[/texture]</span
+              >
+              :
+            </span>
+            <input
+              type="text"
+              :value="colorToString(temp.ring?.color)"
+              @change="e => (temp.ring.color = parseInt(e.target.value, 16))"
+            />
+          </template>
         </div>
-        <div class="flex">
-          <label :for="n_info.name + '-srot'">self rotation speed: </label>
+      </div>
+      <div class="input-wapper">
+        <span>segments : </span>
+        <input type="text" :value="segmentsInfo()" @change="updateSegments($event)" />
+      </div>
+
+      <!-- <PlanetInfoForm
+        keyword="base"
+        content=""
+        required
+        @update="e => console.log(e)"
+      ></PlanetInfoForm>
+      <PlanetInfoForm keyword="distance"></PlanetInfoForm>
+      <PlanetInfoForm keyword="radius"></PlanetInfoForm>
+      <PlanetInfoForm keyword="color"></PlanetInfoForm>
+      <PlanetInfoForm keyword="texture"></PlanetInfoForm>
+      <PlanetInfoForm keyword="rotationSpeed"></PlanetInfoForm>
+      <PlanetInfoForm keyword="revolutionSpeed"></PlanetInfoForm>
+      <PlanetInfoForm keyword="light"></PlanetInfoForm>
+      <PlanetInfoForm keyword="ring"></PlanetInfoForm>
+      <PlanetInfoForm keyword="segments"></PlanetInfoForm>
+
+      <div v-for="[key, value] in Object.entries(temp).filter(([key]) => key !== 'name')">
+        <div class="input-wapper">
+          <span :class="InputTemplate.s_NeededProps.includes(key) ? 'required' : ''"
+            >{{ key + " : " }}
+          </span>
           <input
-            v-model.number="n_info.selfRotateSpeed"
-            :id="n_info.name + '-srot'"
-            type="number"
-            step="0.1"
+            v-if="typeof value !== 'object'"
+            type="text"
+            :value="`${value}`"
+            @change="e => (value = e.target.value)"
           />
-        </div>
-        <div v-if="n_info.texture">texture: {{ n_info.texture }}</div>
-        <div v-else class="flex">color: {{ n_info.color }}</div>
-        <div v-if="hasLight">
-          light: &nbsp;{
-          <div class="indent">
-            <div>color : {{ hexadecimal(n_info.light.color) }}</div>
-            <div>intensity : {{ n_info.light.intensity }}</div>
+          <div v-else>
+            <input
+              type="text"
+              :value="`(${value}`"
+              @change="
+                e => {
+                  value = e.target.value;
+                }
+              "
+            />
           </div>
-          }
-        </div>
-        <div v-if="hasRing">
-          ring: &nbsp;
-          <div class="indent">
-            <div v-for="(item, key) in n_info.ring">{{ key }} : {{ item }}</div>
-          </div>
-        </div>
-      </div>
+        </div> 
+      </div> -->
+      <div style="height: 40px"></div>
     </div>
     <button @click="comfirm" class="comfirm-btn">comfirm</button>
   </div>
+
   <div class="seperator"></div>
 </template>
 
@@ -161,46 +266,80 @@ function comfirm() {
   height: 1.4em;
 }
 
-.flex {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
+.indented {
+  text-indent: 2em;
+  max-height: 0;
+  transition: max-height 0.1s ease-in-out;
+  overflow: hidden;
 }
 
-label {
-  text-wrap: nowrap;
+span.color-control {
+  font-size: 10px;
+}
+
+span.color-control:hover {
+  cursor: pointer;
+  color: rgb(255, 78, 78);
+}
+
+span.color-control:active {
+  color: rgb(78, 255, 47);
+}
+
+.expand {
+  max-height: 500px;
+}
+
+.message {
+  padding-left: 1.2em;
+}
+
+.message * {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.input-wapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.input-wapper span {
+  flex: none;
+}
+
+.required::before {
+  content: "*";
+  color: red;
+  font-size: small;
+  vertical-align: top;
+  margin-left: -5.5px;
 }
 
 input,
 input::placeholder {
-  max-width: 40%;
+  width: 100%;
+  height: 100%;
   font-style: italic;
   outline: none;
-  height: 1.2em;
   border: none;
   color: rgb(17, 69, 67);
   caret-color: rgb(200, 157, 27);
   background-color: rgb(61, 119, 169);
+  transform: translateY(1px);
 }
 
-input {
-  autocomplete: false;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-}
-
-@supports (-moz-appearance: none) {
-  input[type="number"] {
-    -moz-appearance: textfield;
-  }
+input[type="checkbox"] {
+  width: initial;
+  margin-left: 0.5em;
+  align-self: center;
+  transform: translateY(1.5px);
 }
 
 .form {
   border-radius: 4px;
-  margin: 0 0.5em;
+  width: 95%;
+  margin: 0 auto;
   background: rgb(61, 119, 169);
 }
 
@@ -240,40 +379,6 @@ input[type="number"]::-webkit-outer-spin-button {
 .colored {
   font-weight: bolder;
   color: rgb(207, 40, 143);
-}
-
-.message {
-  padding-left: 1.2em;
-}
-
-.message * {
-  font-size: 17px;
-  font-weight: 500;
-}
-
-.base-obj strong {
-  font-style: italic;
-  color: rgb(74, 231, 234);
-}
-
-.message > .options {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.options div {
-  width: 50%;
-}
-
-.options input {
-  margin-left: 0.3em;
-  margin-top: 0.2em;
-  width: 0.9em;
-  height: 0.9em;
-}
-
-.indent {
-  margin-left: 1.2em;
 }
 
 .comfirm-btn {

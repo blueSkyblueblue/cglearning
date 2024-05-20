@@ -4,12 +4,18 @@ import * as THREE from "three";
 import SimpleScene from "./js/SimpleScene.js";
 import Space from "./js/SpaceCamera.js";
 
-const props = defineProps(["size", "config", "planets"]);
+const props = defineProps(["size", "config", "planets", "accessable"]);
+const emit = defineEmits(["access-scene"]);
 const domElement = ref(null);
 const viewFocused = ref(true);
+const fullscreen = ref(false);
 
 const renderer = ref(null);
 const scene = new SimpleScene().reset(props.planets);
+if (props.accessable) emit("access-scene", scene);
+///////////////////// DEBUG /////////////////////
+console.log(scene);
+///////////////////// DEBUG /////////////////////
 
 const rotatedCamera = new Space.RotatedCamera(50, 1);
 const fixedCamera = new Space.FixedCamera(50, 1);
@@ -23,6 +29,10 @@ window.addEventListener("click", e => {
   else viewFocused.value = false;
 });
 
+window.addEventListener("keydown", e => {
+  if (viewFocused.value === false) return;
+  if (e.shiftKey === true && e.key.toLowerCase() === "f") fullscreen.value = !fullscreen.value;
+});
 onMounted(() => {
   async function autoresize(size) {
     renderer.value.setSize(size.width, size.height);
@@ -35,11 +45,23 @@ onMounted(() => {
   autoresize(props.size);
   renderer.value.setPixelRatio(window.devicePixelRatio);
 
-  watch(() => props.size, autoresize, { deep: true });
+  watch(
+    () =>
+      fullscreen.value
+        ? {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          }
+        : props.size,
+    autoresize,
+    { deep: true }
+  );
+
   watch(
     () => props.config.orbit,
     async show => scene.configOrbits(show)
   );
+
   watch(
     () => props.config.fixedCamera,
     async is => {
@@ -68,7 +90,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="container">
+  <div :class="fullscreen ? 'fullscreen' : ''" class="container">
     <canvas
       :class="viewFocused ? 'outline-border' : ''"
       id="planets-space"
@@ -100,5 +122,11 @@ onUnmounted(() => {
   bottom: 1em;
   color: rgb(121, 188, 148);
   z-index: 100;
+}
+
+div.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 </style>

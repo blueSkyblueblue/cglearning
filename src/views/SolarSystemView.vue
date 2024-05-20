@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineAsyncComponent, onMounted } from "vue";
+import { ref, defineAsyncComponent } from "vue";
 import PageTemplate from "@/components/PageTemplate.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import SolarSystemControlPanel from "@/components/SolarSystemControlPanel.vue";
@@ -9,15 +9,8 @@ const PlanetsSpace = defineAsyncComponent(() => import("@/components/PlanetsSpac
 const additionalLinks = [{ path: "/three-view", text: "Three View" }];
 const size = ref({ width: 100, height: 100 });
 const config = ref({ orbit: false, fixedCamera: false });
-const fullscreen = ref(false);
 
 function recalcSize() {
-  if (fullscreen.value === true) {
-    size.value.width = window.innerWidth;
-    size.value.height = window.innerHeight;
-    return;
-  }
-
   let width = window.innerWidth - 370;
   if (window.innerWidth > 1180) width -= 150;
   let height = window.innerHeight - 120;
@@ -29,12 +22,6 @@ function recalcSize() {
 
 recalcSize();
 window.addEventListener("resize", recalcSize);
-window.addEventListener("keydown", e => {
-  if (e.shiftKey === true && e.key.toLowerCase() === "f") {
-    fullscreen.value = !fullscreen.value;
-    recalcSize();
-  }
-});
 </script>
 
 <template>
@@ -49,12 +36,7 @@ window.addEventListener("keydown", e => {
       />
     </template>
     <template v-slot:content>
-      <PlanetsSpace
-        :class="fullscreen ? 'fullscreen' : ''"
-        :config="config"
-        :size="size"
-        :planets="planets"
-      />
+      <PlanetsSpace :config="config" :size="size" :planets="planets" />
     </template>
   </PageTemplate>
 </template>
@@ -62,11 +44,5 @@ window.addEventListener("keydown", e => {
 <style scoped>
 .background {
   background-image: linear-gradient(to bottom, rgb(209, 216, 168), rgb(77, 169, 109));
-}
-
-div.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
 }
 </style>

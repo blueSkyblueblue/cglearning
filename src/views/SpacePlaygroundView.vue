@@ -3,37 +3,37 @@ import { ref, defineAsyncComponent, watch } from "vue";
 import PageTemplate from "@/components/PageTemplate.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import PlaygroundControlPanel from "@/components/PlaygroundControlPanel.vue";
+
 const PlanetsSpace = defineAsyncComponent(() => import("@/components/PlanetsSpace.vue"));
-import planetsInformation from "@/components/js/PlanetsInformation.js";
-
 const additionalLinks = [{ path: "/three-view", text: "Three View" }];
-
-const planets = ref([
-  {
-    radius: 10,
-    segments: [40, 20],
-    distance: 0,
-    rotateSpeed: 0,
-    selfRotateSpeed: 0.4,
-    texture: "textures/sun.jpg",
-    light: { color: 0xffffff, intensity: 15000 },
-    name: "sun",
-    base: "scene",
-  },
-]);
-let updated = ref(false);
 
 const size = ref({ width: 100, height: 100 });
 const config = ref({ orbit: false, fixedCamera: false });
-const fullscreen = ref(false);
+
+let scene = null;
+const initialPlanets = [
+  {
+    name: "sun",
+    base: "scene",
+    radius: 10,
+    distance: 0,
+    revolutionSpeed: 0,
+    rotationSpeed: 0.4,
+    texture: "textures/sun.jpg",
+    light: { color: 0xffffff, intensity: 15000 },
+    segments: [40, 20],
+  },
+];
+
+recalcSize();
+window.addEventListener("resize", recalcSize);
+
+function getSceneHandle(sceneHandle) {
+  scene = sceneHandle;
+  console.log(scene.reset(initialPlanets));
+}
 
 function recalcSize() {
-  if (fullscreen.value === true) {
-    size.value.width = window.innerWidth;
-    size.value.height = window.innerHeight;
-    return;
-  }
-
   let width = window.innerWidth - 370;
   if (window.innerWidth > 1180) width -= 150;
   let height = window.innerHeight - 120;
@@ -43,22 +43,10 @@ function recalcSize() {
   size.value.height = height;
 }
 
-recalcSize();
-window.addEventListener("resize", recalcSize);
-window.addEventListener("keydown", e => {
-  if (e.shiftKey === true && e.key.toLowerCase() === "f") {
-    fullscreen.value = !fullscreen.value;
-    recalcSize();
-  }
-});
-
 function updatePlanets(e_data) {
-  const index = planets.value.findIndex(item => item[0].name === e_data[0].name);
-  if (index >= 0) planets.value[index] = e_data;
-  else planets.value.push(e_data);
-
-  updated.value = true;
-  console.log("SpacePlaygound: ", planets.value);
+  const planet = scene.planets.find(item => item.info.name === e_data.name);
+  if (planet) scene.change(planet, e_data);
+  else scene.add(e_data);
 }
 </script>
 
@@ -72,16 +60,18 @@ function updatePlanets(e_data) {
         @show-orbit="config.orbit = !config.orbit"
         @change-camera="config.fixedCamera = !config.fixedCamera"
         @update-planets="updatePlanets"
-        :planets="planets"
+        @remove="name => scene.remove(name)"
+        :planets="initialPlanets"
         :config="config"
       />
     </template>
     <template v-slot:content>
       <PlanetsSpace
-        :class="fullscreen ? 'fullscreen' : ''"
+        @access-scene="getSceneHandle"
         :size="size"
         :config="config"
-        :planets="planetsInformation"
+        :planets="[]"
+        accessable="true"
       />
     </template>
   </PageTemplate>
@@ -90,11 +80,5 @@ function updatePlanets(e_data) {
 <style scoped>
 .background {
   background-image: linear-gradient(to bottom, rgb(209, 216, 168), rgb(77, 169, 109));
-}
-
-div.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
 }
 </style>

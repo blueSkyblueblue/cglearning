@@ -1,5 +1,5 @@
 <script setup>
-import { defineAsyncComponent, ref } from "vue";
+import { defineAsyncComponent } from "vue";
 
 const BottomLink = defineAsyncComponent(() => import("./BottomLink.vue"));
 defineProps(["setting"]);

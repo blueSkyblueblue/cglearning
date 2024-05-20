@@ -1,7 +1,18 @@
 import * as THREE from "three";
 
+const EASY_UPDATE_PROPS = [
+  "radius",
+  "base",
+  "distance",
+  "color",
+  "texture",
+  "rotationSpeed",
+  "revolutionSpeed",
+];
+
 class SimpleScene {
   static s_TextureLoader = new THREE.TextureLoader();
+  #showOrbit = false;
   constructor(lightIntensity = 0.1) {
     this.planets = [];
     this.inst = new THREE.Scene();
@@ -24,7 +35,6 @@ class SimpleScene {
   }
 
   reset(planets) {
-    console.log(planets);
     this.clear();
     planets.forEach(planet => this.add(planet));
     return this;
@@ -43,12 +53,59 @@ class SimpleScene {
       else item.objs.system.remove(item.objs.orbit);
     });
 
+    this.#showOrbit = show;
     return this;
+  }
+
+  change(planet, n_info) {
+    EASY_UPDATE_PROPS.forEach(prop => {
+      if (planet.info[prop] !== n_info[prop]) {
+        planet.objs;
+      }
+    });
+
+    const info = planet.info;
+    info.rotationSpeed = n_info.rotationSpeed;
+    info.revolutionSpeed = n_info.revolutionSpeed;
+    if (info.distance !== n_info.distance) {
+      planet.objs.mesh.position.set(n_info.distance, 0, 0);
+      info.distance = n_info.distance;
+    }
+
+    const n_baseplt = this.planets.find(item => item.info.name === n_info.base);
+
+    if (info.base !== n_info.base) {
+      n_baseplt.mesh.add(planet.objs.system);
+      // planet.objs.system.position.set(...n_baseplt.mesh.position);
+      info.base = n_info.base;
+    }
+
+    if (info.radius !== n_info.radius) {
+      const scalar = n_info.radius / info.radius;
+      planet.objs.mesh.scale.set(planet.objs.mesh.scale.multiplyScalar(scalar));
+      info.radius = n_info.radius;
+    }
+
+    if (info.color != n_info.color) {
+      planet.objs.mesh.material.color.set(info.color);
+      info.color = n_info.color;
+    }
+
+    if (info.texture != n_info.texture) {
+    }
+
+    if (info.light != n_info.light) {
+    }
+
+    if (info.ring != n_info.ring) {
+    }
+
+    console.log(this);
   }
 
   add(planet) {
     const mesh = SimpleScene.#createMesh(planet);
-    if ("ring" in planet) {
+    if (planet.ring) {
       const ring = SimpleScene.#createMesh(planet.ring, false);
       mesh.add(ring);
       ring.rotateX((Math.PI * 3) / 7);
@@ -60,11 +117,12 @@ class SimpleScene {
     if (planet.base === "scene") this.inst.add(system);
     else {
       const baseobjs = this.planets.find(item => item.info.name === planet.base).objs;
-      baseobjs.system.add(system);
-      system.position.set(...baseobjs.mesh.position);
+      baseobjs.mesh.add(system);
+      // system.position.set(...baseobjs.mesh.position);
     }
 
     const orbit = SimpleScene.#generateOrbit(planet.distance);
+    if (this.#showOrbit) system.add(orbit);
 
     this.planets.push({
       info: planet,
@@ -121,10 +179,10 @@ class SimpleScene {
     if (isSphere === true) geometry = new THREE.SphereGeometry(info.radius);
     else geometry = new THREE.RingGeometry(info.innerRadius, info.outerRadius);
 
-    const hasLight = "light" in info;
+    const hasLight = info.light ? true : false;
     const func = hasLight ? THREE.MeshBasicMaterial : THREE.MeshStandardMaterial;
     const side = isSphere ? THREE.FrontSide : THREE.DoubleSide;
-    if ("texture" in info) {
+    if (info.texture) {
       material = new func({
         map: SimpleScene.s_TextureLoader.load(info.texture),
         side,
