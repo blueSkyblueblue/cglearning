@@ -15,17 +15,10 @@ const vertices = [
 function toggleType() {
   isRegular.value = !isRegular.value;
   emit("tetra-type-changed", isRegular.value, vertices);
-
-  const panel = document.getElementById("vertices");
-  if (isRegular.value === true) panel.classList.add("close-vertices-panel");
-  else panel.classList.remove("close-vertices-panel");
-
-  console.log(panel.clientHeight);
 }
 
 function updateVertices() {
   const verticesList = document.getElementsByClassName("vertex-item");
-  // const newVertices = [new Vector3(), new Vector3(), new Vector3(), new Vector3()];
   for (let i = 0; i < vertices.length; i++) {
     const vertexValues = verticesList[i].getElementsByTagName("input");
     vertices[i].x = vertexValues[0].value;
@@ -42,53 +35,65 @@ function radToDeg(radian) {
 </script>
 
 <template>
-  <h3>Control Panel</h3>
-  <div class="section">
-    <div class="item-header">Tetrahedron Type:</div>
-    <div class="buttons">
-      <div class="radio-button">
-        <input type="radio" id="regular-type" @change="toggleType" :checked="isRegular" />
-        <label for="regular-type">Regular</label>
-      </div>
-      <div class="radio-button">
-        <input type="radio" id="normal-type" @change="toggleType" :checked="!isRegular" />
-        <label for="normal-type">Custom</label>
+  <div class="wapper">
+    <h3>Control Panel</h3>
+    <div class="section">
+      <div class="item-header">Tetrahedron Type:</div>
+      <div class="buttons">
+        <div class="radio-button">
+          <input type="radio" id="regular-type" @change="toggleType" :checked="isRegular" />
+          <label for="regular-type">Regular</label>
+        </div>
+        <div class="radio-button">
+          <input type="radio" id="normal-type" @change="toggleType" :checked="!isRegular" />
+          <label for="normal-type">Custom</label>
+        </div>
       </div>
     </div>
-  </div>
-  <!-- <hr /> -->
-  <div id="vertices" class="close-vertices-panel">
-    <div class="vertices-header">Setup the Vertices' Position</div>
-    <ul>
-      <li class="vertex-item" v-for="(item, index) in vertices">
-        <span class="vertex-prefix"> {{ ["A", "B", "C", "D"][index] }} : </span>
-        <div class="vertex-value">
-          <div v-for="(subitem, i) in item">
-            <label :for="'vertices_' + index + '_' + i"> {{ ["x", "y", "z"][i] }} :</label>
-            <input type="number" :id="'vertices_' + index + '_' + i" step="0.1" :value="subitem" />
+    <!-- <hr /> -->
+    <div id="vertices" :class="isRegular ? 'close-vertices-panel' : ''">
+      <div class="vertices-header">Setup the Vertices' Position</div>
+      <ul>
+        <li class="vertex-item" v-for="(item, index) in vertices">
+          <span class="vertex-prefix"> {{ ["A", "B", "C", "D"][index] }} : </span>
+          <div class="vertex-value">
+            <div v-for="(subitem, i) in item">
+              <label :for="'vertices_' + index + '_' + i"> {{ ["x", "y", "z"][i] }} :</label>
+              <input
+                type="number"
+                :id="'vertices_' + index + '_' + i"
+                step="0.1"
+                :value="subitem"
+              />
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
 
-    <button type="button" @click="updateVertices">commit</button>
-  </div>
+      <button type="button" @click="updateVertices">commit</button>
+    </div>
 
-  <!-- <hr /> -->
-  <div class="section rotation-panel">
-    <div class="item-header">Rotation in degree: <em>(read only)</em></div>
-    <div><span>x:</span> <input type="number" :value="radToDeg(rotation.x)" disabled /></div>
-    <div><span>y:</span> <input type="number" :value="radToDeg(rotation.y)" disabled /></div>
-    <div><span>z:</span> <input type="number" :value="radToDeg(rotation.z)" disabled /></div>
-  </div>
-  <hr />
+    <!-- <hr /> -->
+    <div class="section rotation-panel">
+      <div class="item-header">Rotation in degree: <em>(read only)</em></div>
+      <div><span>x:</span> <input type="number" :value="radToDeg(rotation.x)" disabled /></div>
+      <div><span>y:</span> <input type="number" :value="radToDeg(rotation.y)" disabled /></div>
+      <div><span>z:</span> <input type="number" :value="radToDeg(rotation.z)" disabled /></div>
+    </div>
+    <hr />
 
-  <div class="section">
-    <div class="item-header"></div>
+    <div class="bottom-padding"></div>
   </div>
 </template>
 
 <style scoped>
+.wapper {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
 h3 {
   text-align: center;
   font-size: 20px;
@@ -156,6 +161,10 @@ h3 {
   transition: max-height 0.5s ease-in-out;
 }
 
+#vertices.close-vertices-panel {
+  max-height: 0;
+}
+
 .vertices-header {
   color: white;
   padding: 5px 0;
@@ -217,10 +226,8 @@ h3 {
   width: 1.2em;
   font-weight: bold;
 }
-</style>
 
-<style>
-#vertices.close-vertices-panel {
-  max-height: 0;
+.bottom-padding {
+  height: 300px;
 }
 </style>

@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { BufferGeometry } from "three";
+import { Scene } from "three";
 
 const EASY_UPDATE_PROPS = [
   "radius",
@@ -31,6 +33,7 @@ class SimpleScene {
       item.objs.mesh.rotation.y += ts * item.info.rotationSpeed;
       item.objs.system.rotation.y += ts * item.info.revolutionSpeed;
     });
+
     return this;
   }
 
@@ -58,31 +61,40 @@ class SimpleScene {
   }
 
   change(planet, n_info) {
-    EASY_UPDATE_PROPS.forEach(prop => {
-      if (planet.info[prop] !== n_info[prop]) {
-        planet.objs;
-      }
-    });
-
     const info = planet.info;
     info.rotationSpeed = n_info.rotationSpeed;
     info.revolutionSpeed = n_info.revolutionSpeed;
+
     if (info.distance !== n_info.distance) {
-      planet.objs.mesh.position.set(n_info.distance, 0, 0);
+      planet.objs.system.children.forEach(child => child.position.set(n_info.distance, 0, 0));
+      planet.objs.orbit.position.set(0, 0, 0);
+      if (info.distance !== 0) {
+        planet.objs.orbit.scale.multiplyScalar(n_info.distance / info.distance);
+      } else {
+        console.log(planet.objs.orbit.geometry);
+        planet.objs.orbit.geometry.setFromPoints(SimpleScene.#sampleOrbit(n_info.distance));
+        planet.objs.orbit.scale.set(1, 1, 1);
+      }
+
       info.distance = n_info.distance;
     }
 
     const n_baseplt = this.planets.find(item => item.info.name === n_info.base);
-
     if (info.base !== n_info.base) {
-      n_baseplt.mesh.add(planet.objs.system);
-      // planet.objs.system.position.set(...n_baseplt.mesh.position);
+      if (n_info.base === "scene") {
+        this.inst.add(planet.objs.system);
+        planet.objs.system.position.set(0, 0, 0);
+      } else {
+        n_baseplt.objs.system.add(planet.objs.system);
+        planet.objs.system.position.set(...n_baseplt.objs.mesh.position);
+      }
+
       info.base = n_info.base;
     }
 
     if (info.radius !== n_info.radius) {
       const scalar = n_info.radius / info.radius;
-      planet.objs.mesh.scale.set(planet.objs.mesh.scale.multiplyScalar(scalar));
+      planet.objs.mesh.scale.multiplyScalar(scalar);
       info.radius = n_info.radius;
     }
 
@@ -104,6 +116,8 @@ class SimpleScene {
   }
 
   add(planet) {
+    console.log("add", planet);
+
     const mesh = SimpleScene.#createMesh(planet);
     if (planet.ring) {
       const ring = SimpleScene.#createMesh(planet.ring, false);
@@ -117,8 +131,8 @@ class SimpleScene {
     if (planet.base === "scene") this.inst.add(system);
     else {
       const baseobjs = this.planets.find(item => item.info.name === planet.base).objs;
-      baseobjs.mesh.add(system);
-      // system.position.set(...baseobjs.mesh.position);
+      baseobjs.system.add(system);
+      system.position.set(...baseobjs.mesh.position);
     }
 
     const orbit = SimpleScene.#generateOrbit(planet.distance);
@@ -152,25 +166,25 @@ class SimpleScene {
   }
 
   static #generateOrbit(radius) {
-    function sampleOrbit(radius) {
-      const count = Math.ceil((radius + 20) / 1.5);
-      const step = (Math.PI * 2) / count;
-
-      const points = [];
-      for (let i = 0; i <= count; i++) {
-        const angle = i * step;
-        points.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
-      }
-
-      return points;
-    }
-
-    const points = sampleOrbit(radius);
+    const points = SimpleScene.#sampleOrbit(radius);
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const material = new THREE.LineBasicMaterial({ color: "lightblue" });
     const orbit = new THREE.Line(geometry, material);
 
     return orbit;
+  }
+
+  static #sampleOrbit(radius) {
+    const count = Math.ceil((radius + 20) / 1.5);
+    const step = (Math.PI * 2) / count;
+
+    const points = [];
+    for (let i = 0; i <= count; i++) {
+      const angle = i * step;
+      points.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
+    }
+
+    return points;
   }
 
   static #createMesh(info, isSphere = true) {

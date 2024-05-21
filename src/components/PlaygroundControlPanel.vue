@@ -5,7 +5,7 @@ import InputTemplate from "./js/InputTemplate";
 const BottomLink = defineAsyncComponent(() => import("./BottomLink.vue"));
 const PlanetInfoForm = defineAsyncComponent(() => import("./PlanetInfoForm.vue"));
 const props = defineProps({ planets: Array, config: Object });
-defineEmits(["show-orbit", "remove", "change-camera", "update-planets"]);
+const emit = defineEmits(["show-orbit", "remove", "change-camera", "update-planets"]);
 
 const planetGalleries = ref([]);
 const asking = ref(false);
@@ -17,13 +17,13 @@ onBeforeMount(() => {
   console.log(planetGalleries.value);
 });
 
-function remove(name) {
-  emit("remove", name);
-  planetGalleries.value = planetGalleries.value.filter(item => item.name !== name);
-  console.log(planetGalleries.value);
+function remove(planet) {
+  planetGalleries.value = planetGalleries.value.filter(item => item.name !== planet.name);
+  emit("remove", planet);
+  console.log("now", planetGalleries.value);
 }
 
-function addPlanet(name) {
+function addPlanetForm(name) {
   if (!name || planetGalleries.value.find(item => item.name == name)) {
     customContent.value = "The name already exists or it's not valid!";
     return;
@@ -58,12 +58,7 @@ console.log(planetGalleries.value);
       <PlanetInfoForm
         v-for="item in planetGalleries"
         :info="item"
-        @comfirm="
-          e_data => {
-            console.log(e_data);
-            $emit('update-planets', e_data);
-          }
-        "
+        @comfirm="e_data => $emit('update-planets', e_data)"
         @remove="remove"
       />
       <div class="pop-window" v-if="asking">
@@ -74,7 +69,7 @@ console.log(planetGalleries.value);
         />
       </div>
       <div class="custom" v-if="customContent">{{ customContent }}</div>
-      <button @click="asking ? addPlanet(newPlanetName) : (asking = true)" id="new-planet-btn">
+      <button @click="asking ? addPlanetForm(newPlanetName) : (asking = true)" id="new-planet-btn">
         {{ asking ? "Ok" : "Add New One" }}
       </button>
     </div>

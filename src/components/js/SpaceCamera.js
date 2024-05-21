@@ -42,6 +42,10 @@ class SpaceCameraController {
     this.#camera = camera;
   }
 
+  clear() {
+    this.#controlKeyState.fill(false);
+  }
+
   update(ts, speed) {
     const distances = this.#controlKeyState.map(state => (state ? ts * speed : 0));
     // console.log(distances);

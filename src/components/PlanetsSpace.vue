@@ -24,9 +24,12 @@ let camera = rotatedCamera;
 const controlsMap = { forward: "w", back: "s", left: "a", right: "d", up: "q", down: "e" };
 const controller = new Space.SpaceCameraController(rotatedCamera, controlsMap);
 
-window.addEventListener("click", e => {
+window.addEventListener("mousedown", e => {
   if (e.target === domElement.value) viewFocused.value = true;
-  else viewFocused.value = false;
+  else {
+    controller.clear();
+    viewFocused.value = false;
+  }
 });
 
 window.addEventListener("keydown", e => {

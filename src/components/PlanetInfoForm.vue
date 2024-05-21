@@ -5,7 +5,6 @@ import InputTemplate from "./js/InputTemplate.js";
 const props = defineProps(["info"]);
 const emit = defineEmits(["remove", "comfirm"]);
 
-console.log(props.info);
 const temp = reactive(new InputTemplate().from(props.info));
 const hasLight = ref(false);
 const hasRing = ref(false);
@@ -65,7 +64,7 @@ function segmentsInfo() {
   <div class="form">
     <div class="plt-name">
       Name: <span class="colored">{{ temp.name }}</span>
-      <span class="icon" @click="$emit('remove', temp.name)"></span>
+      <span class="icon" @click="$emit('remove', temp)"></span>
     </div>
     <div class="message">
       <div class="input-wapper">
