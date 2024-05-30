@@ -33,7 +33,7 @@ function setup() {
 }
 
 function prepareTheScene() {
-  scene.fog = new THREE.FogExp2("lightblue", 0.05);
+  scene.fog = new THREE.FogExp2("lightblue", 0.01);
   scene.background = new THREE.Color("lightblue");
   scene.add(new THREE.AxesHelper(10));
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -74,10 +74,10 @@ function updateTetrahedron() {
 }
 
 function prepareTheObject() {
-  threeView.push(new CustomRenderer(canvasLength, canvasLength, [0, 0, 10])); // Face to face
-  threeView.push(new CustomRenderer(canvasLength, canvasLength, [0, 10, 0])); // Look down
-  threeView.push(new CustomRenderer(canvasLength, canvasLength, [-10, 0, 0])); // Look right
-  renderer = new CustomRenderer(canvasLength, canvasLength, [0, 0, 10], true); // Perspective Projection
+  threeView.push(new CustomRenderer(canvasLength, canvasLength, [10, 0, 0])); // Face to face
+  threeView.push(new CustomRenderer(canvasLength, canvasLength, [0, 0, 10])); // Look down
+  threeView.push(new CustomRenderer(canvasLength, canvasLength, [0, -10, 0])); // Look right
+  renderer = new CustomRenderer(canvasLength, canvasLength, [10, 0, 0], true); // Perspective Projection
   renderer.domElement.classList.add("perspective-view");
   const labels = ["Main View", "Left View", "Top View"];
   threeView.forEach((renderer, index) =>
@@ -92,8 +92,8 @@ function setupEventHandler(renderer) {
   renderer.domElement.addEventListener("mousemove", e => {
     console.log("mousemove: ", e);
     if (e.buttons === 1) {
-      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), e.movementY / 40);
-      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), e.movementX / 40);
+      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), e.movementY / 40);
+      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), e.movementX / 40);
       updateRotation(tetrahedron);
     }
   });
@@ -101,13 +101,8 @@ function setupEventHandler(renderer) {
   renderer.domElement.addEventListener("wheel", e => {
     e.preventDefault();
     // rotation on the world z axis
-    if (e.wheelDelta > 0) {
-      tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), 0.1);
-      updateRotation(tetrahedron);
-      return;
-    }
-
-    tetrahedron.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), -0.1);
+    const rotation = 0.001 * e.wheelDelta;
+    tetrahedron.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotation);
     updateRotation(tetrahedron);
   });
 

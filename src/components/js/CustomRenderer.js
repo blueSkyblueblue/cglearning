@@ -64,12 +64,7 @@ class CustomRenderer {
     const aspect = this.width / this.height;
 
     if (perspective === true) {
-      camera = new THREE.PerspectiveCamera( // Camera (Perspective)
-        75,
-        aspect,
-        CustomRenderer.near,
-        CustomRenderer.far
-      );
+      camera = new THREE.PerspectiveCamera(75, aspect, CustomRenderer.near, CustomRenderer.far); // Camera (Perspective)
     } else {
       camera = new THREE.OrthographicCamera(
         -distance,
@@ -82,6 +77,7 @@ class CustomRenderer {
     }
 
     camera.position.set(...position);
+    camera.up.set(0, 0, 1); // set the up axis for camera before calling lookAt function
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
 

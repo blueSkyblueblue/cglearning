@@ -6,10 +6,10 @@ const props = defineProps({ vertices: Array, rotation: Vector3 });
 const emit = defineEmits(["tetra-type-changed", "vertices-updated"]);
 const isRegular = ref(true);
 const vertices = [
-  new Vector3(-2, -1, 0),
-  new Vector3(2, -1, 0),
-  new Vector3(0, 1, 2),
-  new Vector3(0, 1, -2),
+  new Vector3(0, 1, -3),
+  new Vector3(1, -2, 0),
+  new Vector3(0, 3, 3),
+  new Vector3(-3, -2, 0),
 ];
 
 function toggleType() {
