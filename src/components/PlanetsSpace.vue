@@ -47,6 +47,7 @@ onMounted(() => {
   renderer.value = new THREE.WebGLRenderer({ canvas: domElement.value });
   autoresize(props.size);
   renderer.value.setPixelRatio(window.devicePixelRatio);
+  // renderer.value.shadowMap.enabled = true;
 
   watch(
     () =>

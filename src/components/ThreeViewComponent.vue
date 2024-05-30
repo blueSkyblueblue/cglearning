@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import * as THREE from "three";
 import CustomRenderer from "./js/CustomRenderer.js";
 
@@ -126,6 +126,16 @@ onMounted(() => {
   }
 
   renderer.renderer.setAnimationLoop(animate);
+});
+
+onUnmounted(() => {
+  threeView.forEach(renderer => {
+    renderer.renderer.dispose();
+    renderer.renderer.forceContextLoss();
+  });
+
+  renderer.renderer.dispose();
+  renderer.renderer.forceContextLoss();
 });
 </script>
 

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { AmbientLight } from "three";
 import { BufferGeometry } from "three";
 import { Scene } from "three";
 
@@ -15,7 +16,7 @@ const EASY_UPDATE_PROPS = [
 class SimpleScene {
   static s_TextureLoader = new THREE.TextureLoader();
   #showOrbit = false;
-  constructor(lightIntensity = 0.1) {
+  constructor(lightIntensity = 0.2) {
     this.planets = [];
     this.inst = new THREE.Scene();
     this.#setupBackground("textures/stars.jpg", lightIntensity);
@@ -207,7 +208,14 @@ class SimpleScene {
 
     const mesh = new THREE.Mesh(geometry, material);
     if (hasLight === true) {
-      mesh.add(new THREE.PointLight(info.light.color, info.light.intensity));
+      const light = new THREE.PointLight(info.light.color, info.light.intensity);
+      light.castShadow = true;
+      mesh.add(light);
+    }
+
+    if (!hasLight) {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
     }
 
     return mesh;
